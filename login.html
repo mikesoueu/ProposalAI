@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ProposalAI — Sign In</title>
+  <meta name="description" content="Sign in or create your ProposalAI account to start generating winning proposals."/>
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml"/>
+  <link rel="stylesheet" href="css/style.css"/>
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <style>
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+
+    .auth-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-20) var(--space-6);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .auth-wrapper::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 900px; height: 700px;
+      background: radial-gradient(ellipse, rgba(124,108,255,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-10);
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+      animation: fadeUp 0.5s ease;
+    }
+
+    .auth-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--grad-primary);
+    }
+
+    .auth-logo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      justify-content: center;
+      margin-bottom: var(--space-8);
+    }
+
+    .auth-logo-icon {
+      width: 44px; height: 44px;
+      background: var(--grad-primary);
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: var(--shadow-primary);
+    }
+
+    .auth-logo-text {
+      font-size: var(--font-size-xl);
+      font-weight: 800;
+      background: var(--grad-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+
+    /* Tab switcher */
+    .auth-tabs {
+      display: flex;
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      padding: 4px;
+      margin-bottom: var(--space-8);
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: var(--space-2) var(--space-4);
+      border: none;
+      background: transparent;
+      color: var(--color-text-muted);
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      transition: all var(--transition-base);
+    }
+
+    .auth-tab.active {
+      background: var(--grad-primary);
+      color: #fff;
+      box-shadow: 0 2px 10px var(--color-primary-glow);
+    }
+
+    /* Form */
+    .auth-form { display: flex; flex-direction: column; gap: var(--space-4); }
+
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      margin: var(--space-2) 0;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--color-border);
+    }
+
+    .auth-divider span {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-faint);
+    }
+
+    .auth-footer {
+      text-align: center;
+      margin-top: var(--space-6);
+      font-size: var(--font-size-xs);
+      color: var(--color-text-faint);
+    }
+
+    .auth-footer a {
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+
+    /* Error / success messages */
+    .auth-message {
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      display: none;
+      margin-bottom: var(--space-2);
+    }
+
+    .auth-message.error {
+      background: rgba(255, 92, 122, 0.1);
+      border: 1px solid rgba(255, 92, 122, 0.3);
+      color: var(--color-danger);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .auth-message.success {
+      background: rgba(0, 217, 163, 0.1);
+      border: 1px solid rgba(0, 217, 163, 0.3);
+      color: var(--color-accent);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .auth-submit {
+      width: 100%;
+      padding: var(--space-4);
+      font-size: var(--font-size-base);
+      border-radius: var(--radius-lg);
+      margin-top: var(--space-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-3);
+    }
+
+    .confirm-box {
+      background: rgba(124,108,255,0.08);
+      border: 1px solid rgba(124,108,255,0.2);
+      border-radius: var(--radius-lg);
+      padding: var(--space-8);
+      text-align: center;
+      display: none;
+    }
+
+    .confirm-icon { font-size: 3rem; margin-bottom: var(--space-4); }
+    .confirm-title { font-size: var(--font-size-lg); font-weight: 700; margin-bottom: var(--space-2); }
+    .confirm-sub { font-size: var(--font-size-sm); color: var(--color-text-muted); }
+
+    /* Password eye toggle */
+    .input-wrap { position: relative; }
+    .input-wrap .form-input { padding-right: 44px; }
+    .eye-btn {
+      position: absolute;
+      right: 12px; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none;
+      color: var(--color-text-faint);
+      cursor: pointer;
+      padding: 4px;
+      display: flex; align-items: center;
+      transition: color var(--transition-fast);
+    }
+    .eye-btn:hover { color: var(--color-text-muted); }
+  </style>
+</head>
+<body>
+
+<!-- ── Nav ─────────────────────────────────────────────────── -->
+<nav class="nav scrolled">
+  <div class="container nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" width="20" height="20">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+        </svg>
+      </div>
+      <span class="nav-logo-text">ProposalAI</span>
+    </a>
+    <div class="lang-switcher">
+      <button id="lang-btn">🇺🇸 English</button>
+      <div id="lang-dropdown" class="lang-dropdown" data-lang-menu></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Auth Card ────────────────────────────────────────────── -->
+<div class="auth-wrapper">
+  <div class="auth-card">
+
+    <!-- Logo -->
+    <div class="auth-logo">
+      <div class="auth-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" width="22" height="22">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="9" y1="13" x2="15" y2="13"/>
+        </svg>
+      </div>
+      <span class="auth-logo-text">ProposalAI</span>
+    </div>
+
+    <!-- Tabs -->
+    <div class="auth-tabs" role="tablist">
+      <button class="auth-tab active" id="tab-signin" role="tab" onclick="switchTab('signin')">Sign In</button>
+      <button class="auth-tab" id="tab-signup" role="tab" onclick="switchTab('signup')">Create Account</button>
+    </div>
+
+    <!-- Message area -->
+    <div class="auth-message" id="auth-message" role="alert"></div>
+
+    <!-- ── Sign In Form ─────────────────────────────────────── -->
+    <form class="auth-form" id="form-signin" onsubmit="handleSignIn(event)" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="signin-email">Email</label>
+        <input type="email" id="signin-email" class="form-input" placeholder="your@email.com" required autocomplete="email"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="signin-password">Password</label>
+        <div class="input-wrap">
+          <input type="password" id="signin-password" class="form-input" placeholder="••••••••" required autocomplete="current-password"/>
+          <button type="button" class="eye-btn" onclick="togglePass('signin-password', this)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary auth-submit" id="btn-signin">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Sign In
+      </button>
+    </form>
+
+    <!-- ── Sign Up Form ─────────────────────────────────────── -->
+    <form class="auth-form" id="form-signup" onsubmit="handleSignUp(event)" novalidate style="display:none;">
+      <div class="form-group">
+        <label class="form-label" for="signup-name">Your Full Name <span class="req">*</span></label>
+        <input type="text" id="signup-name" class="form-input" placeholder="Jane Smith" required autocomplete="name"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="signup-email">Email <span class="req">*</span></label>
+        <input type="email" id="signup-email" class="form-input" placeholder="your@email.com" required autocomplete="email"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="signup-password">Password <span class="req">*</span></label>
+        <div class="input-wrap">
+          <input type="password" id="signup-password" class="form-input" placeholder="Minimum 8 characters" required minlength="8" autocomplete="new-password"/>
+          <button type="button" class="eye-btn" onclick="togglePass('signup-password', this)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Email confirmation box (shown after signup) -->
+      <div class="confirm-box" id="confirm-box">
+        <div class="confirm-icon">📧</div>
+        <div class="confirm-title">Check your email!</div>
+        <div class="confirm-sub">We sent a confirmation link to your email. Click the link to activate your account, then come back to sign in.</div>
+      </div>
+
+      <button type="submit" class="btn btn-primary auth-submit" id="btn-signup">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+        Create Free Account
+      </button>
+
+      <p style="font-size:var(--font-size-xs);color:var(--color-text-faint);text-align:center;">
+        By creating an account you agree to our <a href="#" style="color:var(--color-primary);">Terms of Service</a>
+      </p>
+    </form>
+
+    <div class="auth-footer">
+      <a href="index.html">← Back to homepage</a>
+    </div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="js/i18n.js"></script>
+<script>
+  // ── Check if already logged in ─────────────────────────────
+  window.addEventListener('load', async () => {
+    const { createClient } = supabase;
+    const _supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (user) {
+      // Already logged in — redirect to dashboard
+      window.location.href = 'dashboard.html';
+    }
+  });
+
+  // ── Language switcher ───────────────────────────────────────
+  document.getElementById('lang-btn').addEventListener('click', e => {
+    e.stopPropagation();
+    document.getElementById('lang-dropdown').classList.toggle('open');
+  });
+  document.addEventListener('click', () => document.getElementById('lang-dropdown').classList.remove('open'));
+  setTimeout(() => { if (typeof I18N !== 'undefined') I18N.buildLangMenu('lang-dropdown'); }, 300);
+
+  // ── Tab switcher ────────────────────────────────────────────
+  function switchTab(tab) {
+    document.getElementById('form-signin').style.display = tab === 'signin' ? 'flex' : 'none';
+    document.getElementById('form-signup').style.display = tab === 'signup' ? 'flex' : 'none';
+    document.getElementById('tab-signin').classList.toggle('active', tab === 'signin');
+    document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+    clearMessage();
+  }
+
+  // ── Show message ─────────────────────────────────────────────
+  function showMessage(text, type = 'error') {
+    const el = document.getElementById('auth-message');
+    const icons = { error: '❌', success: '✅' };
+    el.innerHTML = `<span>${icons[type]}</span><span>${text}</span>`;
+    el.className = `auth-message ${type}`;
+    el.style.display = 'flex';
+  }
+
+  function clearMessage() {
+    const el = document.getElementById('auth-message');
+    el.style.display = 'none';
+  }
+
+  // ── Password visibility ──────────────────────────────────────
+  function togglePass(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const show = input.type === 'password';
+    input.type = show ? 'text' : 'password';
+    btn.innerHTML = show
+      ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`
+      : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+  }
+
+  // ── Supabase client ──────────────────────────────────────────
+  const { createClient } = supabase;
+  const _supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+
+  // ── Set button loading state ─────────────────────────────────
+  function setLoading(btnId, loading, text) {
+    const btn = document.getElementById(btnId);
+    btn.disabled = loading;
+    if (loading) {
+      btn.innerHTML = `<div class="spinner"></div> ${text}`;
+    }
+  }
+
+  // ── Handle Sign In ───────────────────────────────────────────
+  async function handleSignIn(e) {
+    e.preventDefault();
+    clearMessage();
+    const email    = document.getElementById('signin-email').value.trim();
+    const password = document.getElementById('signin-password').value;
+
+    if (!email || !password) {
+      showMessage('Please fill in all fields.'); return;
+    }
+
+    setLoading('btn-signin', true, 'Signing in...');
+
+    const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      setLoading('btn-signin', false, '');
+      document.getElementById('btn-signin').innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Sign In`;
+      const msg = error.message.includes('Invalid login')
+        ? 'Invalid email or password. Please try again.'
+        : error.message;
+      showMessage(msg);
+      return;
+    }
+
+    // Success → redirect to dashboard
+    showMessage('Welcome back! Redirecting...', 'success');
+    setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
+  }
+
+  // ── Handle Sign Up ───────────────────────────────────────────
+  async function handleSignUp(e) {
+    e.preventDefault();
+    clearMessage();
+    const name     = document.getElementById('signup-name').value.trim();
+    const email    = document.getElementById('signup-email').value.trim();
+    const password = document.getElementById('signup-password').value;
+
+    if (!name || !email || !password) {
+      showMessage('Please fill in all fields.'); return;
+    }
+    if (password.length < 8) {
+      showMessage('Password must be at least 8 characters.'); return;
+    }
+
+    setLoading('btn-signup', true, 'Creating account...');
+
+    const { data, error } = await _supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: name },
+        emailRedirectTo: `${window.location.origin}/dashboard.html`,
+      },
+    });
+
+    if (error) {
+      setLoading('btn-signup', false, '');
+      document.getElementById('btn-signup').innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg> Create Free Account`;
+      showMessage(error.message);
+      return;
+    }
+
+    // Show confirmation message
+    document.getElementById('btn-signup').style.display = 'none';
+    document.getElementById('confirm-box').style.display = 'block';
+    showMessage('Account created! Please check your email to confirm.', 'success');
+  }
+</script>
+</body>
+</html>

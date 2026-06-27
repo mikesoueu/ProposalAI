@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ProposalAI — Win More Deals. Close Faster.</title>
+  <meta name="description" content="Generate stunning professional sales proposals and contracts in under 60 seconds. AI-powered, digital signature, Stripe payments. Try free."/>
+  <meta name="keywords" content="proposal generator, AI proposals, sales proposal, contract generator, freelancer tools"/>
+  <meta property="og:title" content="ProposalAI — Win More Deals. Close Faster."/>
+  <meta property="og:description" content="Generate professional proposals in seconds with AI. Digital signature + Stripe payments included."/>
+  <meta property="og:type" content="website"/>
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml"/>
+  <link rel="stylesheet" href="css/style.css"/>
+  <style>
+    /* ── Hero ─────────────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: calc(var(--nav-height) + var(--space-20)) var(--space-6) var(--space-20);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--grad-hero);
+      pointer-events: none;
+    }
+    .hero-noise {
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+    .hero-content { position: relative; z-index: 1; max-width: 800px; }
+    .hero-badge { margin-bottom: var(--space-6); }
+    .hero h1 {
+      font-size: var(--font-size-5xl);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin-bottom: var(--space-6);
+    }
+    .hero h1 .line2 { display: block; background: var(--grad-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-sub {
+      font-size: var(--font-size-lg);
+      color: var(--color-text-muted);
+      max-width: 580px;
+      margin: 0 auto var(--space-10);
+      line-height: 1.7;
+    }
+    .hero-actions { display: flex; gap: var(--space-4); justify-content: center; flex-wrap: wrap; margin-bottom: var(--space-16); }
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-12);
+      flex-wrap: wrap;
+    }
+    .hero-stat-val {
+      font-size: var(--font-size-2xl);
+      font-weight: 800;
+      background: var(--grad-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.03em;
+    }
+    .hero-stat-label { font-size: var(--font-size-xs); color: var(--color-text-faint); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-top: var(--space-1); }
+
+    /* Floating elements */
+    .hero-float {
+      position: absolute;
+      opacity: 0.6;
+      pointer-events: none;
+      animation: float 6s ease-in-out infinite;
+    }
+    .hero-float-1 { top: 20%; left: 8%; animation-delay: 0s; }
+    .hero-float-2 { top: 30%; right: 8%; animation-delay: 2s; }
+    .hero-float-3 { bottom: 25%; left: 12%; animation-delay: 4s; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    /* ── Features ─────────────────────────────────────────── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-6);
+      margin-top: var(--space-12);
+    }
+    .feat-card {
+      padding: var(--space-8);
+    }
+    .feat-icon {
+      width: 52px; height: 52px;
+      background: rgba(124,108,255,0.12);
+      border: 1px solid rgba(124,108,255,0.2);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: var(--space-5);
+      transition: all var(--transition-base);
+    }
+    .feat-card:hover .feat-icon {
+      background: rgba(124,108,255,0.2);
+      transform: scale(1.1);
+    }
+    .feat-title { font-size: var(--font-size-md); font-weight: 700; margin-bottom: var(--space-2); letter-spacing: -0.01em; }
+    .feat-desc { font-size: var(--font-size-sm); color: var(--color-text-muted); line-height: 1.7; }
+
+    /* ── How It Works ─────────────────────────────────────── */
+    .how-section { background: var(--color-surface); }
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-8);
+      margin-top: var(--space-12);
+      position: relative;
+    }
+    .how-grid::before {
+      content: '';
+      position: absolute;
+      top: 36px;
+      left: calc(100% / 6);
+      right: calc(100% / 6);
+      height: 2px;
+      background: linear-gradient(to right, var(--color-primary), var(--color-accent));
+      opacity: 0.3;
+    }
+    .how-item { text-align: center; padding: var(--space-6); }
+    .how-num {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: var(--grad-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-size-xl);
+      font-weight: 900;
+      color: #fff;
+      margin: 0 auto var(--space-5);
+      box-shadow: 0 0 30px var(--color-primary-glow);
+    }
+    .how-step-label { font-size: var(--font-size-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-primary); margin-bottom: var(--space-2); }
+    .how-title { font-size: var(--font-size-lg); font-weight: 700; margin-bottom: var(--space-3); }
+    .how-desc { font-size: var(--font-size-sm); color: var(--color-text-muted); line-height: 1.7; }
+
+    /* ── Pricing ──────────────────────────────────────────── */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-6);
+      margin-top: var(--space-4);
+      align-items: start;
+    }
+    .pricing-card {
+      padding: var(--space-8);
+      position: relative;
+    }
+    .pricing-card.popular {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 40px var(--color-primary-glow);
+      transform: scale(1.03);
+    }
+    .popular-badge {
+      position: absolute;
+      top: -14px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--grad-primary);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 16px;
+      border-radius: var(--radius-full);
+      white-space: nowrap;
+    }
+    .plan-name { font-size: var(--font-size-sm); font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: var(--space-4); }
+    .plan-price { display: flex; align-items: flex-end; gap: var(--space-1); margin-bottom: var(--space-6); }
+    .plan-price-sym { font-size: var(--font-size-xl); font-weight: 700; margin-bottom: 6px; }
+    .plan-price-val { font-size: 48px; font-weight: 900; letter-spacing: -0.04em; line-height: 1; }
+    .plan-price-per { font-size: var(--font-size-sm); color: var(--color-text-muted); margin-bottom: 8px; }
+    .plan-features { list-style: none; margin-bottom: var(--space-8); display: flex; flex-direction: column; gap: var(--space-3); }
+    .plan-features li { display: flex; align-items: flex-start; gap: var(--space-3); font-size: var(--font-size-sm); color: var(--color-text-muted); }
+    .plan-features li::before { content: '✓'; color: var(--color-accent); font-weight: 700; flex-shrink: 0; }
+
+    /* ── Testimonials ─────────────────────────────────────── */
+    .testimonials-section { background: var(--color-surface); }
+    .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-6); margin-top: var(--space-12); }
+    .testimonial-card { padding: var(--space-8); }
+    .testimonial-quote { font-size: var(--font-size-sm); color: var(--color-text-muted); line-height: 1.8; margin-bottom: var(--space-6); font-style: italic; }
+    .testimonial-stars { color: #FFB836; font-size: 14px; margin-bottom: var(--space-4); letter-spacing: 2px; }
+    .testimonial-author { display: flex; align-items: center; gap: var(--space-3); }
+    .testimonial-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .avatar-1 { background: rgba(124,108,255,0.2); color: var(--color-primary); }
+    .avatar-2 { background: rgba(0,217,163,0.2); color: var(--color-accent); }
+    .avatar-3 { background: rgba(255,184,54,0.2); color: var(--color-warning); }
+    .testimonial-name { font-weight: 700; font-size: var(--font-size-sm); }
+    .testimonial-role { font-size: var(--font-size-xs); color: var(--color-text-faint); }
+
+    /* ── CTA Section ─────────────────────────────────────── */
+    .cta-section {
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px; height: 400px;
+      background: radial-gradient(ellipse, rgba(124,108,255,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cta-title { font-size: var(--font-size-4xl); font-weight: 900; letter-spacing: -0.04em; margin-bottom: var(--space-4); }
+    .cta-sub { font-size: var(--font-size-md); color: var(--color-text-muted); margin-bottom: var(--space-10); }
+
+    /* ── Footer ──────────────────────────────────────────── */
+    .footer {
+      background: var(--color-surface);
+      border-top: 1px solid var(--color-border);
+      padding: var(--space-16) 0 var(--space-8);
+    }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: var(--space-12); margin-bottom: var(--space-12); }
+    .footer-brand p { font-size: var(--font-size-sm); color: var(--color-text-muted); margin-top: var(--space-4); max-width: 260px; line-height: 1.7; }
+    .footer-col-title { font-size: var(--font-size-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-text-faint); margin-bottom: var(--space-4); }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: var(--space-3); }
+    .footer-links a { font-size: var(--font-size-sm); color: var(--color-text-muted); transition: color var(--transition-fast); }
+    .footer-links a:hover { color: var(--color-text); }
+    .footer-bottom { display: flex; align-items: center; justify-content: space-between; padding-top: var(--space-6); border-top: 1px solid var(--color-border); font-size: var(--font-size-xs); color: var(--color-text-faint); flex-wrap: wrap; gap: var(--space-4); }
+
+    /* ── Mobile ──────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .hero h1 { font-size: var(--font-size-3xl); }
+      .features-grid, .how-grid, .testimonials-grid { grid-template-columns: 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .pricing-card.popular { transform: none; }
+      .how-grid::before { display: none; }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: var(--space-8); }
+      .hero-stats { gap: var(--space-8); }
+      .hero-float { display: none; }
+      .cta-title { font-size: var(--font-size-2xl); }
+    }
+
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 42px; line-height: 1.1; }
+      .hero-sub { font-size: 16px; margin-bottom: var(--space-8); }
+      .hero-actions { flex-direction: column; gap: var(--space-4); }
+      .hero-actions .btn { width: 100%; justify-content: center; }
+      .hero-stats { flex-direction: column; gap: var(--space-6); text-align: center; margin-top: var(--space-12); }
+      .nav-inner { flex-wrap: wrap; gap: var(--space-4); justify-content: center; }
+      .nav-actions { margin-top: var(--space-2); }
+      .nav-actions .lang-switcher { display: block; }
+      .footer-grid { grid-template-columns: 1fr; text-align: center; }
+      .footer-brand p { margin: var(--space-4) auto 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Navigation ──────────────────────────────────────── -->
+<nav class="nav" role="navigation" aria-label="Main navigation">
+  <div class="container nav-inner">
+    <a href="index.html" class="nav-logo" aria-label="ProposalAI Home">
+      <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="9" y1="13" x2="15" y2="13"/>
+          <line x1="9" y1="17" x2="13" y2="17"/>
+          <polyline points="9 9 10 9"/>
+        </svg>
+      </div>
+      <span class="nav-logo-text">ProposalAI</span>
+    </a>
+
+    <ul class="nav-links" role="list">
+      <li><a href="#features" data-i18n="nav_features">Features</a></li>
+      <li><a href="#how" data-i18n="nav_how">How It Works</a></li>
+      <li><a href="#pricing" data-i18n="nav_pricing">Pricing</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <div class="lang-switcher">
+        <button id="lang-btn" aria-label="Switch language">🇺🇸 English</button>
+        <div id="lang-dropdown" class="lang-dropdown" data-lang-menu role="menu"></div>
+      </div>
+      <a href="login.html" class="btn btn-primary" data-i18n="nav_start">Get Started Free</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Hero ────────────────────────────────────────────── -->
+<section class="hero" role="banner">
+  <div class="hero-noise"></div>
+
+  <!-- Floating icons -->
+  <div class="hero-float hero-float-1">
+    <div style="width:56px;height:56px;background:rgba(124,108,255,0.15);border:1px solid rgba(124,108,255,0.3);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;">📄</div>
+  </div>
+  <div class="hero-float hero-float-2">
+    <div style="width:56px;height:56px;background:rgba(0,217,163,0.15);border:1px solid rgba(0,217,163,0.3);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;">✍️</div>
+  </div>
+  <div class="hero-float hero-float-3">
+    <div style="width:56px;height:56px;background:rgba(255,184,54,0.15);border:1px solid rgba(255,184,54,0.3);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;">💳</div>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="badge">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <span data-i18n="hero_badge">AI-Powered Proposals</span>
+      </span>
+    </div>
+
+    <h1>
+      <span data-i18n="hero_title">Win More Deals.</span>
+      <span class="line2" data-i18n="hero_title2">Close Faster.</span>
+    </h1>
+
+    <p class="hero-sub" data-i18n="hero_sub">
+      Generate stunning, professional sales proposals and contracts in under 60 seconds. Powered by AI — designed to impress.
+    </p>
+
+    <div class="hero-actions">
+      <a href="login.html" class="btn btn-primary btn-lg" id="hero-cta" data-i18n="hero_cta">
+        Create Your First Proposal — Free
+      </a>
+      <a href="#how" class="btn btn-ghost btn-lg" data-i18n="hero_cta2">Watch Demo</a>
+    </div>
+
+    <div class="hero-stats">
+      <div>
+        <div class="hero-stat-val" data-i18n="hero_stat1_val">12,400+</div>
+        <div class="hero-stat-label" data-i18n="hero_stat1">Proposals Sent</div>
+      </div>
+      <div>
+        <div class="hero-stat-val" data-i18n="hero_stat2_val">68%</div>
+        <div class="hero-stat-label" data-i18n="hero_stat2">Average Close Rate</div>
+      </div>
+      <div>
+        <div class="hero-stat-val" data-i18n="hero_stat3_val">3 hrs/deal</div>
+        <div class="hero-stat-label" data-i18n="hero_stat3">Time Saved</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Features ─────────────────────────────────────────── -->
+<section class="section" id="features">
+  <div class="container">
+    <div class="text-center" data-animate>
+      <h2 class="section-title" data-i18n="feat_title">Everything You Need to Close the Deal</h2>
+      <p class="section-sub" data-i18n="feat_sub">From proposal generation to payment collection — all in one place.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="glass-card feat-card" data-animate>
+        <div class="feat-icon">🤖</div>
+        <h3 class="feat-title" data-i18n="feat1_title">AI-Generated Proposals</h3>
+        <p class="feat-desc" data-i18n="feat1_desc">Fill out a quick form and our AI writes a professional proposal tailored to your client's needs in seconds.</p>
+      </div>
+      <div class="glass-card feat-card" data-animate>
+        <div class="feat-icon">✍️</div>
+        <h3 class="feat-title" data-i18n="feat2_title">Digital Signature</h3>
+        <p class="feat-desc" data-i18n="feat2_desc">Clients can sign directly in the browser — no printing, no scanning, no PDFs back and forth.</p>
+      </div>
+      <div class="glass-card feat-card" data-animate>
+        <div class="feat-icon">💳</div>
+        <h3 class="feat-title" data-i18n="feat3_title">Instant Payment Links</h3>
+        <p class="feat-desc" data-i18n="feat3_desc">Add a Stripe payment link to your proposal so clients can pay the retainer the moment they sign.</p>
+      </div>
+      <div class="glass-card feat-card" data-animate>
+        <div class="feat-icon">📄</div>
+        <h3 class="feat-title" data-i18n="feat4_title">PDF Export</h3>
+        <p class="feat-desc" data-i18n="feat4_desc">Download your proposal as a beautiful, branded PDF ready to send by email in one click.</p>
+      </div>
+      <div class="glass-card feat-card" data-animate>
+        <div class="feat-icon">🎨</div>
+        <h3 class="feat-title" data-i18n="feat5_title">Custom Branding</h3>
+        <p class="feat-desc" data-i18n="feat5_desc">Add your logo, colors, and contact info. Every proposal feels 100% yours.</p>
+      </div>
+      <div class="glass-card feat-card" data-animate>
+        <div class="feat-icon">🌍</div>
+        <h3 class="feat-title" data-i18n="feat6_title">Multi-Language</h3>
+        <p class="feat-desc" data-i18n="feat6_desc">Generate proposals in 8 languages. Expand your business globally without limits.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── How It Works ─────────────────────────────────────── -->
+<section class="section how-section" id="how">
+  <div class="container">
+    <div class="text-center" data-animate>
+      <h2 class="section-title" data-i18n="how_title">How It Works</h2>
+      <p class="section-sub" data-i18n="how_sub">Three simple steps from blank page to closed deal.</p>
+    </div>
+
+    <div class="how-grid">
+      <div class="how-item" data-animate>
+        <div class="how-num">1</div>
+        <div class="how-step-label" data-i18n="how1_step">Step 1</div>
+        <h3 class="how-title" data-i18n="how1_title">Fill the Form</h3>
+        <p class="how-desc" data-i18n="how1_desc">Tell us about your project, your client, and your pricing. It takes less than 2 minutes.</p>
+      </div>
+      <div class="how-item" data-animate>
+        <div class="how-num">2</div>
+        <div class="how-step-label" data-i18n="how2_step">Step 2</div>
+        <h3 class="how-title" data-i18n="how2_title">AI Generates</h3>
+        <p class="how-desc" data-i18n="how2_desc">Our AI writes the full proposal — executive summary, scope, deliverables, timeline, and contract terms.</p>
+      </div>
+      <div class="how-item" data-animate>
+        <div class="how-num">3</div>
+        <div class="how-step-label" data-i18n="how3_step">Step 3</div>
+        <h3 class="how-title" data-i18n="how3_title">Send & Get Paid</h3>
+        <p class="how-desc" data-i18n="how3_desc">Share the proposal link, collect a digital signature, and receive payment — all without leaving the platform.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Pricing ───────────────────────────────────────────── -->
+<section class="section" id="pricing">
+  <div class="container">
+    <div class="text-center" data-animate>
+      <h2 class="section-title" data-i18n="pricing_title">Simple, Transparent Pricing</h2>
+      <p class="section-sub" data-i18n="pricing_sub">Start free. Upgrade when you're ready. Cancel anytime.</p>
+    </div>
+
+    <div class="pricing-toggle" data-animate>
+      <span class="toggle-label active" id="toggle-monthly" data-i18n="pricing_monthly">Monthly</span>
+      <div class="toggle-track" id="pricing-toggle" role="switch" aria-checked="false">
+        <div class="toggle-thumb"></div>
+      </div>
+      <span class="toggle-label" id="toggle-annual" data-i18n="pricing_annual">Annual</span>
+      <span class="save-badge" data-i18n="pricing_save">Save 20%</span>
+    </div>
+
+    <div class="pricing-grid">
+      <!-- Starter -->
+      <div class="glass-card pricing-card" data-animate>
+        <div class="plan-name" data-i18n="plan_starter">Starter</div>
+        <div class="plan-price">
+          <span class="plan-price-sym">$</span>
+          <span class="plan-price-val price-monthly">29</span>
+          <span class="plan-price-val price-annual" style="display:none">23</span>
+          <span class="plan-price-per" data-i18n="plan_mo">/mo</span>
+        </div>
+        <ul class="plan-features" role="list">
+          <li data-i18n="plan_s1">5 proposals per month</li>
+          <li data-i18n="plan_s2">AI proposal generation</li>
+          <li data-i18n="plan_s3">PDF export</li>
+          <li data-i18n="plan_s4">Digital signature</li>
+          <li data-i18n="plan_s5">Stripe payment links</li>
+          <li style="color: var(--color-accent); font-weight: 500; font-size: 13px; margin-top: 8px;">⚡ Run out of proposals? Buy extra credits on-demand ($5 for 10)</li>
+        </ul>
+        <button class="btn btn-ghost" style="width:100%;" id="btn-starter" data-i18n="plan_cta_start" onclick="handlePlanClick('starter')">Get Started</button>
+      </div>
+
+      <!-- Pro -->
+      <div class="glass-card pricing-card popular" data-animate>
+        <div class="popular-badge" data-i18n="plan_popular">Most Popular</div>
+        <div class="plan-name" data-i18n="plan_pro">Pro</div>
+        <div class="plan-price">
+          <span class="plan-price-sym">$</span>
+          <span class="plan-price-val price-monthly">79</span>
+          <span class="plan-price-val price-annual" style="display:none">63</span>
+          <span class="plan-price-per" data-i18n="plan_mo">/mo</span>
+        </div>
+        <ul class="plan-features" role="list">
+          <li data-i18n="plan_p1">Unlimited proposals</li>
+          <li data-i18n="plan_p2">Custom branding & logo</li>
+          <li data-i18n="plan_p3">All Starter features</li>
+          <li data-i18n="plan_p4">Priority AI generation</li>
+          <li data-i18n="plan_p5">Email support</li>
+        </ul>
+        <button class="btn btn-primary" style="width:100%;" id="btn-pro" data-i18n="plan_cta_start" onclick="handlePlanClick('pro')">Get Started</button>
+      </div>
+
+      <!-- Agency -->
+      <div class="glass-card pricing-card" data-animate>
+        <div class="plan-name" data-i18n="plan_agency">Agency</div>
+        <div class="plan-price">
+          <span class="plan-price-sym">$</span>
+          <span class="plan-price-val price-monthly">149</span>
+          <span class="plan-price-val price-annual" style="display:none">119</span>
+          <span class="plan-price-per" data-i18n="plan_mo">/mo</span>
+        </div>
+        <ul class="plan-features" role="list">
+          <li data-i18n="plan_a1">Everything in Pro</li>
+          <li data-i18n="plan_a2">5 team members</li>
+          <li data-i18n="plan_a3">White-label (your domain)</li>
+          <li data-i18n="plan_a4">API access</li>
+          <li data-i18n="plan_a5">Dedicated support</li>
+        </ul>
+        <button class="btn btn-ghost" style="width:100%;" id="btn-agency" data-i18n="plan_cta_contact" onclick="handlePlanClick('agency')">Contact Sales</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Testimonials ──────────────────────────────────────── -->
+<section class="section testimonials-section" id="testimonials">
+  <div class="container">
+    <div class="text-center" data-animate>
+      <h2 class="section-title" data-i18n="test_title">Trusted by Freelancers &amp; Agencies Worldwide</h2>
+    </div>
+
+    <div class="testimonials-grid">
+      <div class="glass-card testimonial-card" data-animate>
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-quote" data-i18n="test1_text">"I used to spend 4 hours writing proposals. Now it takes 5 minutes and they look 10x better. My close rate went from 30% to 70%."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar avatar-1">S</div>
+          <div>
+            <div class="testimonial-name" data-i18n="test1_name">Sarah M.</div>
+            <div class="testimonial-role" data-i18n="test1_role">UX Designer, Freelancer</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card testimonial-card" data-animate>
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-quote" data-i18n="test2_text">"We send over 50 proposals a month. ProposalAI cut our proposal time by 90% and our clients love how professional they look."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar avatar-2">J</div>
+          <div>
+            <div class="testimonial-name" data-i18n="test2_name">James T.</div>
+            <div class="testimonial-role" data-i18n="test2_role">CEO, Digital Agency</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card testimonial-card" data-animate>
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-quote" data-i18n="test3_text">"The Stripe payment link inside the proposal is a game changer. Clients pay within hours of receiving it. No more chasing invoices."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar avatar-3">L</div>
+          <div>
+            <div class="testimonial-name" data-i18n="test3_name">Lucia R.</div>
+            <div class="testimonial-role" data-i18n="test3_role">Marketing Consultant</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ───────────────────────────────────────────────── -->
+<section class="section cta-section">
+  <div class="container" data-animate>
+    <h2 class="cta-title">
+      Ready to <span class="gradient-text">close more deals?</span>
+    </h2>
+    <p class="cta-sub" data-i18n="hero_sub">Generate stunning, professional sales proposals and contracts in under 60 seconds.</p>
+    <a href="login.html" class="btn btn-primary btn-lg" id="cta-bottom" data-i18n="hero_cta">Create Your First Proposal — Free</a>
+  </div>
+</section>
+
+<!-- ── Footer ────────────────────────────────────────────── -->
+<footer class="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="nav-logo" style="display:inline-flex;margin-bottom:var(--space-4);">
+          <div class="nav-logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" width="20" height="20">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+          </div>
+          <span class="nav-logo-text">ProposalAI</span>
+        </a>
+        <p data-i18n="footer_tagline">Win More Deals. Close Faster.</p>
+      </div>
+      <div>
+        <div class="footer-col-title" data-i18n="footer_product">Product</div>
+        <ul class="footer-links">
+          <li><a href="#features" data-i18n="footer_features">Features</a></li>
+          <li><a href="#pricing" data-i18n="footer_pricing">Pricing</a></li>
+          <li><a href="#" data-i18n="footer_changelog">Changelog</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title" data-i18n="footer_company">Company</div>
+        <ul class="footer-links">
+          <li><a href="#" data-i18n="footer_about">About</a></li>
+          <li><a href="#" data-i18n="footer_blog">Blog</a></li>
+          <li><a href="#" data-i18n="footer_careers">Careers</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title" data-i18n="footer_legal">Legal</div>
+        <ul class="footer-links">
+          <li><a href="#" data-i18n="footer_privacy">Privacy Policy</a></li>
+          <li><a href="#" data-i18n="footer_terms">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span data-i18n="footer_copy">© 2026 ProposalAI. All rights reserved.</span>
+      <div style="display:flex;gap:var(--space-3);align-items:center;">
+        <div class="lang-switcher">
+          <button id="lang-btn-footer" onclick="document.getElementById('lang-btn').click()" style="background:transparent;border:none;color:var(--color-text-faint);font-size:var(--font-size-xs);cursor:pointer;">🌍 Language</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<div class="toast-container" role="alert" aria-live="polite"></div>
+
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/stripe.js"></script>
+<script src="js/main.js"></script>
+<script>
+  // Pricing buttons — redirect to login first if not logged in
+  let _isAnnual = false;
+
+  // Track toggle state
+  document.addEventListener('DOMContentLoaded', () => {
+    const toggle = document.getElementById('pricing-toggle');
+    if (toggle) toggle.addEventListener('click', () => { _isAnnual = !_isAnnual; });
+  });
+
+  async function handlePlanClick(plan) {
+    const { createClient } = supabase;
+    const _sb = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+    const { data: { user } } = await _sb.auth.getUser();
+
+    const billing = _isAnnual ? 'annual' : 'monthly';
+    const links = billing === 'annual' ? CONFIG.STRIPE_LINKS_ANNUAL : CONFIG.STRIPE_LINKS;
+    const key = billing === 'annual' ? `${plan}_annual` : plan;
+    let url = links[key] || CONFIG.STRIPE_LINKS[plan];
+
+    if (!url || url.includes('YOUR_')) {
+      alert('Stripe links not configured in config.js');
+      return;
+    }
+
+    // If logged in, pre-fill email in Stripe checkout
+    if (user?.email) {
+      url += (url.includes('?') ? '&' : '?') + `prefilled_email=${encodeURIComponent(user.email)}`;
+      // Add success redirect
+      url += `&success_url=${encodeURIComponent(window.location.origin + '/success.html')}`;
+    } else {
+      // Not logged in — send to login first, then they can pick plan
+      localStorage.setItem('proposalai_pending_plan', JSON.stringify({ plan, billing }));
+      window.location.href = 'login.html';
+      return;
+    }
+
+    window.location.href = url;
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,518 @@
+/* ============================================================
+   ProposalAI — Proposal Document Styles
+   ============================================================ */
+
+/* ── Proposal Viewer Layout ──────────────────────────────── */
+.proposal-wrapper {
+  min-height: 100vh;
+  padding-top: var(--nav-height);
+  background: var(--color-bg);
+}
+
+.proposal-toolbar {
+  position: sticky;
+  top: var(--nav-height);
+  z-index: 50;
+  background: rgba(8, 8, 15, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-3) var(--space-6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.proposal-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.proposal-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.proposal-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.proposal-status-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--color-warning);
+  animation: blink 1.5s infinite;
+}
+
+.proposal-status-dot.signed { background: var(--color-success); animation: none; }
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+/* ── Document Area ───────────────────────────────────────── */
+.proposal-document-wrapper {
+  max-width: 860px;
+  margin: var(--space-10) auto;
+  padding: 0 var(--space-6);
+}
+
+/* ── The Actual Document ─────────────────────────────────── */
+.proposal-document {
+  background: #fff;
+  color: #1a1a2e;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: 0 20px 80px rgba(0,0,0,0.7);
+}
+
+/* ── Document Header ─────────────────────────────────────── */
+.doc-header {
+  background: linear-gradient(135deg, #7C6CFF 0%, #A78BFF 60%, #00D9A3 100%);
+  padding: var(--space-12) var(--space-12);
+  position: relative;
+  overflow: hidden;
+}
+
+.doc-header::after {
+  content: '';
+  position: absolute;
+  bottom: -60px; right: -60px;
+  width: 200px; height: 200px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 50%;
+}
+
+.doc-header::before {
+  content: '';
+  position: absolute;
+  top: -40px; left: -40px;
+  width: 160px; height: 160px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 50%;
+}
+
+.doc-header-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+}
+
+.doc-logo-area {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.doc-logo-img {
+  width: 56px; height: 56px;
+  object-fit: contain;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.2);
+  padding: 4px;
+}
+
+.doc-company-name {
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+
+.doc-company-contact {
+  font-size: 13px;
+  color: rgba(255,255,255,0.75);
+  margin-top: 2px;
+}
+
+.doc-meta {
+  text-align: right;
+}
+
+.doc-meta-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: var(--space-2);
+}
+
+.doc-meta-value {
+  font-size: 13px;
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 4px;
+}
+
+.doc-valid-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-size: 11px;
+  color: #fff;
+  margin-top: var(--space-2);
+}
+
+/* ── Document Title Block ────────────────────────────────── */
+.doc-title-block {
+  background: #f8f7ff;
+  padding: var(--space-10) var(--space-12);
+  border-bottom: 2px solid #ede9ff;
+}
+
+.doc-proposal-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #7C6CFF;
+  margin-bottom: var(--space-3);
+}
+
+.doc-proposal-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #1a1a2e;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-bottom: var(--space-2);
+}
+
+.doc-proposal-for {
+  font-size: 15px;
+  color: #6666AA;
+}
+
+.doc-proposal-for span {
+  color: #1a1a2e;
+  font-weight: 700;
+}
+
+/* ── Document Body ───────────────────────────────────────── */
+.doc-body {
+  padding: var(--space-10) var(--space-12);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+}
+
+/* ── Section ─────────────────────────────────────────────── */
+.doc-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #7C6CFF;
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 2px solid #ede9ff;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.doc-section-title::before {
+  content: '';
+  width: 4px; height: 16px;
+  background: linear-gradient(to bottom, #7C6CFF, #A78BFF);
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.doc-text {
+  font-size: 14px;
+  line-height: 1.75;
+  color: #333355;
+}
+
+.doc-text p { margin-bottom: 12px; }
+.doc-text p:last-child { margin-bottom: 0; }
+.doc-text ul, .doc-text ol { padding-left: 20px; margin-bottom: 12px; }
+.doc-text li { margin-bottom: 6px; }
+.doc-text strong { color: #1a1a2e; font-weight: 700; }
+
+/* ── Timeline Table ──────────────────────────────────────── */
+.doc-timeline {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.doc-timeline th {
+  background: #f0eeff;
+  color: #7C6CFF;
+  font-weight: 700;
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.doc-timeline td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid #f0eeff;
+  color: #333355;
+  vertical-align: top;
+}
+
+.doc-timeline tr:last-child td { border-bottom: none; }
+.doc-timeline tr:nth-child(even) td { background: #fafafe; }
+
+/* ── Pricing Table ───────────────────────────────────────── */
+.doc-pricing {
+  border: 2px solid #ede9ff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.doc-pricing-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid #f0eeff;
+}
+
+.doc-pricing-item:last-child { border-bottom: none; }
+
+.doc-pricing-item.total {
+  background: #f0eeff;
+  font-weight: 800;
+}
+
+.doc-pricing-name {
+  font-size: 14px;
+  color: #333355;
+  flex: 1;
+}
+
+.doc-pricing-desc {
+  font-size: 12px;
+  color: #9999BB;
+  margin-top: 2px;
+}
+
+.doc-pricing-amount {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a2e;
+  min-width: 100px;
+  text-align: right;
+}
+
+.doc-pricing-item.total .doc-pricing-amount {
+  color: #7C6CFF;
+  font-size: 20px;
+}
+
+/* ── Signature Section ───────────────────────────────────── */
+.doc-signature-area {
+  background: #f8f7ff;
+  border: 2px solid #ede9ff;
+  border-radius: 16px;
+  padding: var(--space-8);
+  text-align: center;
+}
+
+.doc-signature-canvas-wrap {
+  border: 2px dashed #c8c0ff;
+  border-radius: 12px;
+  background: #fff;
+  margin: var(--space-4) 0;
+  overflow: hidden;
+  position: relative;
+}
+
+#signature-canvas {
+  display: block;
+  width: 100%;
+  height: 150px;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.signature-placeholder {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  color: #c8c0ff;
+  font-size: 13px;
+  pointer-events: none;
+  font-style: italic;
+  transition: opacity 0.3s;
+}
+
+.signature-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.signature-field input {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid #c8c0ff;
+  border-radius: 8px;
+  font-size: 13px;
+  background: #fff;
+  color: #1a1a2e;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.signature-field input:focus { border-color: #7C6CFF; }
+
+.signature-field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #7C6CFF;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: var(--space-2);
+}
+
+.doc-sign-actions {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: center;
+  margin-top: var(--space-5);
+  flex-wrap: wrap;
+}
+
+/* ── Signed State ────────────────────────────────────────── */
+.doc-signed-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: rgba(0, 217, 163, 0.1);
+  border: 1.5px solid rgba(0, 217, 163, 0.4);
+  border-radius: var(--radius-full);
+  padding: var(--space-3) var(--space-5);
+  color: #00D9A3;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+/* ── Payment CTA ─────────────────────────────────────────── */
+.doc-payment-cta {
+  background: linear-gradient(135deg, rgba(124,108,255,0.08), rgba(0,217,163,0.05));
+  border: 1px solid rgba(124,108,255,0.2);
+  border-radius: 16px;
+  padding: var(--space-8);
+  text-align: center;
+}
+
+.doc-payment-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1a1a2e;
+  margin-bottom: var(--space-2);
+}
+
+.doc-payment-sub {
+  font-size: 13px;
+  color: #6666AA;
+  margin-bottom: var(--space-5);
+}
+
+.doc-payment-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: linear-gradient(135deg, #7C6CFF, #A78BFF);
+  color: #fff;
+  padding: var(--space-4) var(--space-8);
+  border-radius: 50px;
+  font-size: 15px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 8px 30px rgba(124,108,255,0.4);
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.doc-payment-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(124,108,255,0.5);
+}
+
+/* ── Document Footer ─────────────────────────────────────── */
+.doc-footer {
+  background: #f8f7ff;
+  border-top: 2px solid #ede9ff;
+  padding: var(--space-6) var(--space-12);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: #9999BB;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.doc-footer-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 700;
+  color: #7C6CFF;
+}
+
+/* ── Print / PDF Styles ──────────────────────────────────── */
+@media print {
+  .nav, .proposal-toolbar, .doc-signature-area { display: none !important; }
+  .proposal-document { box-shadow: none; border-radius: 0; }
+  body { background: #fff; }
+}
+
+/* ── Mobile Layout ──────────────────────────────────────── */
+@media (max-width: 600px) {
+  /* Toolbar: hide text, show icons only to save space */
+  .proposal-toolbar-right .btn span { display: none; }
+  .proposal-toolbar-right .btn svg { margin: 0; }
+  .proposal-toolbar-right { gap: var(--space-2); }
+  
+  /* Document size */
+  .proposal-document-wrapper { padding: var(--space-3); padding-bottom: 120px; }
+  .proposal-document { border-radius: var(--radius-lg); overflow: hidden; }
+  .doc-header-content { padding: var(--space-6); flex-direction: column; align-items: flex-start; gap: var(--space-4); }
+  .doc-meta { text-align: left; align-items: flex-start; }
+  .doc-title-block { padding: var(--space-8) var(--space-6); }
+  .doc-proposal-title { font-size: 32px; }
+  .doc-body { padding: var(--space-6); gap: var(--space-6); }
+  
+  /* Timeline stacking */
+  .doc-timeline thead { display: none; }
+  .doc-timeline tr { display: flex; flex-direction: column; padding: var(--space-4) 0; border-bottom: 1px solid #ede9ff; }
+  .doc-timeline td { padding: var(--space-2) 0; border: none; }
+  .doc-timeline td:nth-child(1) { font-size: 15px; color: #7C6CFF; padding-bottom: 0; }
+  .doc-timeline td:nth-child(2) { font-size: 11px; font-weight: 700; opacity: 0.6; padding-bottom: var(--space-2); }
+  
+  /* Footer */
+  .doc-footer { padding: var(--space-4) var(--space-6); }
+  
+  /* Signature Area */
+  .signature-fields { flex-direction: column; gap: var(--space-4); }
+  .doc-sign-actions { flex-direction: column-reverse; }
+  .doc-sign-actions .btn { width: 100%; justify-content: center; }
+}

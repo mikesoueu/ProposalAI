@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ProposalAI — Create a New Proposal</title>
+  <meta name="description" content="Build a professional AI-generated proposal in minutes. Fill out the form and let AI write your winning proposal."/>
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml"/>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/app.css"/>
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <!-- Auth Guard: block access if not logged in or no plan -->
+  <script>
+    (async () => {
+      // Wait for DOM and config
+      const wait = () => new Promise(r => setTimeout(r, 50));
+      await wait();
+      // Load config inline
+    })();
+  </script>
+</head>
+<body>
+
+<!-- ── Navigation ──────────────────────────────────────── -->
+<nav class="nav scrolled" role="navigation">
+  <div class="container nav-inner">
+    <a href="dashboard.html" class="nav-logo">
+      <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" width="20" height="20">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="9" y1="13" x2="15" y2="13"/>
+        </svg>
+      </div>
+      <span class="nav-logo-text">ProposalAI</span>
+    </a>
+    <div class="nav-actions">
+      <a href="dashboard.html" class="btn btn-ghost btn-sm">← Home</a>
+      <div class="lang-switcher">
+        <button id="lang-btn">🇺🇸 English</button>
+        <div id="lang-dropdown" class="lang-dropdown" data-lang-menu></div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ── App Wrapper ──────────────────────────────────────── -->
+<main class="app-wrapper" role="main">
+  <div class="app-container">
+
+    <!-- Header -->
+    <div class="app-header">
+      <h1 class="app-title">✨ <span data-i18n="app_generate">Generate Proposal with AI</span></h1>
+      <p class="app-subtitle" data-i18n="app_subtitle">Fill in the details below and let AI create your winning proposal</p>
+    </div>
+
+    <!-- API Key Notice -->
+    <div id="api-key-notice" class="key-notice" style="display:none;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span data-i18n="error_key">Please add your OpenAI API key to config.js to generate proposals.</span>
+    </div>
+
+    <!-- Step Indicator -->
+    <div class="steps-row" role="list" aria-label="Form steps">
+      <div class="step-item active" id="step-indicator-1" role="listitem">
+        <div class="step-num">1</div>
+        <div class="step-label" data-i18n="app_step1">Your Info</div>
+      </div>
+      <div class="step-item" id="step-indicator-2" role="listitem">
+        <div class="step-num">2</div>
+        <div class="step-label" data-i18n="app_step2">Project Details</div>
+      </div>
+      <div class="step-item" id="step-indicator-3" role="listitem">
+        <div class="step-num">3</div>
+        <div class="step-label" data-i18n="app_step3">Generate</div>
+      </div>
+      <div class="step-item" id="step-indicator-4" role="listitem">
+        <div class="step-num">4</div>
+        <div class="step-label" data-i18n="app_step4">Send &amp; Pay</div>
+      </div>
+      <div class="steps-progress" id="steps-progress"></div>
+    </div>
+
+    <!-- ── STEP 1: Your Info ────────────────────────────── -->
+    <div class="step-panel form-card" data-step="1">
+      <h2 class="form-card-title" data-i18n="app_step1">Your Info</h2>
+      <p class="form-card-desc">Tell us about yourself so we can brand the proposal correctly.</p>
+
+      <!-- Logo Upload -->
+      <div class="form-group" style="margin-bottom:var(--space-6);">
+        <label class="form-label" data-i18n="app_logo">Upload Your Logo</label>
+        <div class="logo-upload">
+          <div class="logo-preview" id="logo-preview" title="Click to upload logo" role="button" tabindex="0">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-faint)" stroke-width="1.5">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+          </div>
+          <div>
+            <label class="logo-upload-label" for="logo-input">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span data-i18n="app_logo">Upload Your Logo</span>
+            </label>
+            <p class="logo-hint" data-i18n="app_logo_hint">PNG or SVG, max 2MB</p>
+          </div>
+        </div>
+        <input type="file" id="logo-input" accept="image/*" style="display:none;">
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="your_name"><span data-i18n="app_yourname">Your Full Name</span> <span class="req">*</span></label>
+          <input type="text" id="your_name" name="your_name" class="form-input" data-i18n-ph="app_yourname_ph" placeholder="Jane Smith" required autocomplete="name"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="company_name"><span data-i18n="app_company">Your Company Name</span> <span class="req">*</span></label>
+          <input type="text" id="company_name" name="company_name" class="form-input" data-i18n-ph="app_company_ph" placeholder="Acme Studio" required autocomplete="organization"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="your_email"><span data-i18n="app_email">Your Email</span> <span class="req">*</span></label>
+          <input type="email" id="your_email" name="your_email" class="form-input" data-i18n-ph="app_email_ph" placeholder="jane@acmestudio.com" required autocomplete="email"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="your_phone"><span data-i18n="app_phone">Your Phone (optional)</span></label>
+          <input type="tel" id="your_phone" name="your_phone" class="form-input" data-i18n-ph="app_phone_ph" placeholder="+1 555 000 0000" autocomplete="tel"/>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <span></span>
+        <button class="btn btn-primary" data-next-step id="step1-next">
+          <span data-i18n="app_next">Next Step →</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ── STEP 2: Project Details ──────────────────────── -->
+    <div class="step-panel form-card" data-step="2" style="display:none;">
+      <h2 class="form-card-title" data-i18n="app_step2">Project Details</h2>
+      <p class="form-card-desc">Tell us about your client and the project so AI can write the perfect proposal.</p>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="client_name"><span data-i18n="app_clientname">Client Name</span> <span class="req">*</span></label>
+          <input type="text" id="client_name" name="client_name" class="form-input" data-i18n-ph="app_clientname_ph" placeholder="John Doe or Acme Corp" required/>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="client_email"><span data-i18n="app_clientemail">Client Email</span></label>
+          <input type="email" id="client_email" name="client_email" class="form-input" data-i18n-ph="app_clientemail_ph" placeholder="client@company.com"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="client_industry"><span data-i18n="app_industry">Client Industry</span> <span class="req">*</span></label>
+          <select id="client_industry" name="client_industry" class="form-select" required>
+            <option value="" data-i18n="app_industry_ph">Select an industry...</option>
+            <option value="Technology / Software">Technology / Software</option>
+            <option value="E-commerce / Retail">E-commerce / Retail</option>
+            <option value="Healthcare">Healthcare</option>
+            <option value="Finance / Fintech">Finance / Fintech</option>
+            <option value="Real Estate">Real Estate</option>
+            <option value="Education / EdTech">Education / EdTech</option>
+            <option value="Marketing / Advertising">Marketing / Advertising</option>
+            <option value="Food & Beverage">Food &amp; Beverage</option>
+            <option value="Fashion / Apparel">Fashion / Apparel</option>
+            <option value="Non-profit">Non-profit</option>
+            <option value="Legal / Professional Services">Legal / Professional Services</option>
+            <option value="Entertainment / Media">Entertainment / Media</option>
+            <option value="Construction / Architecture">Construction / Architecture</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="project_type"><span data-i18n="app_projtype">Project Type</span> <span class="req">*</span></label>
+          <select id="project_type" name="project_type" class="form-select" required>
+            <option value="" data-i18n="app_projtype_ph">Select a project type...</option>
+            <option value="Website Design & Development">Website Design &amp; Development</option>
+            <option value="Mobile App Development">Mobile App Development</option>
+            <option value="Branding & Identity Design">Branding &amp; Identity Design</option>
+            <option value="Logo Design">Logo Design</option>
+            <option value="Social Media Marketing">Social Media Marketing</option>
+            <option value="SEO & Content Marketing">SEO &amp; Content Marketing</option>
+            <option value="Video Production">Video Production</option>
+            <option value="Copywriting & Content Creation">Copywriting &amp; Content Creation</option>
+            <option value="UI/UX Design">UI/UX Design</option>
+            <option value="E-commerce Setup">E-commerce Setup</option>
+            <option value="Software Development">Software Development</option>
+            <option value="Consulting / Strategy">Consulting / Strategy</option>
+            <option value="Graphic Design">Graphic Design</option>
+            <option value="Photography">Photography</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label class="form-label" for="project_description"><span data-i18n="app_projdesc">Project Description</span> <span class="req">*</span></label>
+          <textarea id="project_description" name="project_description" class="form-textarea" style="min-height:120px;" data-i18n-ph="app_projdesc_ph" placeholder="Briefly describe what the client needs, their goals, and any specific requirements..." required></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="budget_range"><span data-i18n="app_budget">Budget Range (USD)</span> <span class="req">*</span></label>
+          <select id="budget_range" name="budget_range" class="form-select" required onchange="toggleCustomBudget()">
+            <option value="">Select a budget range...</option>
+            <option value="Under $1,000">Under $1,000</option>
+            <option value="$1,000 – $2,500">$1,000 – $2,500</option>
+            <option value="$2,500 – $5,000">$2,500 – $5,000</option>
+            <option value="$5,000 – $10,000">$5,000 – $10,000</option>
+            <option value="$10,000 – $25,000">$10,000 – $25,000</option>
+            <option value="$25,000 – $50,000">$25,000 – $50,000</option>
+            <option value="$50,000 – $100,000">$50,000 – $100,000</option>
+            <option value="Over $100,000">Over $100,000</option>
+            <option value="Custom">Custom value...</option>
+          </select>
+          <input type="text" id="custom_budget" name="custom_budget" class="form-input" style="display: none; margin-top: 10px;" placeholder="E.g., $12,500 or $50/hr" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="start_date"><span data-i18n="app_deadline">Desired Start Date</span></label>
+          <input type="date" id="start_date" name="start_date" class="form-input"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="proposal_currency"><span data-i18n="app_currency">Proposal Currency</span></label>
+          <select id="proposal_currency" name="proposal_currency" class="form-select">
+            <option value="USD">🇺🇸 USD — US Dollar</option>
+            <option value="EUR">🇪🇺 EUR — Euro</option>
+            <option value="GBP">🇬🇧 GBP — British Pound</option>
+            <option value="BRL">🇧🇷 BRL — Brazilian Real</option>
+            <option value="CAD">🇨🇦 CAD — Canadian Dollar</option>
+            <option value="AUD">🇦🇺 AUD — Australian Dollar</option>
+            <option value="JPY">🇯🇵 JPY — Japanese Yen</option>
+            <option value="CNY">🇨🇳 CNY — Chinese Yuan</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="proposal_language"><span data-i18n="app_lang">Proposal Language</span></label>
+          <select id="proposal_language" name="proposal_language" class="form-select">
+            <option value="en">🇺🇸 English</option>
+            <option value="pt">🇧🇷 Português</option>
+            <option value="es">🇪🇸 Español</option>
+            <option value="fr">🇫🇷 Français</option>
+            <option value="de">🇩🇪 Deutsch</option>
+            <option value="it">🇮🇹 Italiano</option>
+            <option value="zh">🇨🇳 中文</option>
+            <option value="ja">🇯🇵 日本語</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-ghost" data-prev-step>
+          <span data-i18n="app_back">← Back</span>
+        </button>
+        <button class="btn btn-primary" data-next-step id="step2-next">
+          <span data-i18n="app_next">Next Step →</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ── STEP 3: Generate ─────────────────────────────── -->
+    <div class="step-panel form-card" data-step="3" style="display:none;">
+      <h2 class="form-card-title" data-i18n="app_step3">Generate</h2>
+      <p class="form-card-desc">Review your information and generate your AI-powered proposal.</p>
+
+      <!-- Summary -->
+      <div class="summary-grid" id="summary-items"></div>
+
+      <!-- Generate Section -->
+      <div id="generate-section" class="generate-section">
+        <div class="divider"></div>
+        <p class="generate-title">✨ Ready to generate!</p>
+        <p class="generate-sub" data-i18n="app_generating">Our AI will write a complete professional proposal in under 30 seconds.</p>
+        <div class="generate-btn-wrap">
+          <button class="btn btn-primary btn-lg" id="generate-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            <span data-i18n="app_generate">✨ Generate Proposal with AI</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- AI Loading -->
+      <div id="ai-loading" class="ai-loading" style="display:none;">
+        <div class="ai-loading-icon">🤖</div>
+        <div class="ai-loading-text" data-i18n="app_generating">AI is writing your proposal...</div>
+        <div class="ai-loading-sub">This usually takes 15–30 seconds. Please wait.</div>
+        <div class="ai-progress">
+          <div class="ai-progress-bar" id="ai-progress-bar"></div>
+        </div>
+      </div>
+
+      <!-- Result Section -->
+      <div id="result-section" style="display:none;">
+        <div style="text-align:center;padding:var(--space-8) 0;">
+          <div style="font-size:3rem;margin-bottom:var(--space-4);">🎉</div>
+          <h3 style="font-size:var(--font-size-xl);font-weight:700;margin-bottom:var(--space-2);" data-i18n="app_generated">Your proposal is ready!</h3>
+          <p style="color:var(--color-text-muted);margin-bottom:var(--space-8);font-size:var(--font-size-sm);">Your professional proposal has been generated. Preview it or download as PDF.</p>
+          <div class="result-actions">
+            <a href="proposal.html" class="btn btn-primary btn-lg" id="preview-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <span data-i18n="app_preview">Preview Proposal</span>
+            </a>
+            <button class="btn btn-ghost btn-lg" id="new-proposal-btn-step3" onclick="location.reload()">
+              + <span data-i18n="app_newprop">New Proposal</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions" id="step3-back-row">
+        <button class="btn btn-ghost" data-prev-step>
+          <span data-i18n="app_back">← Back</span>
+        </button>
+        <span></span>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<div class="toast-container" role="alert" aria-live="polite"></div>
+
+<script src="config.js?v=4"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/i18n.js?v=4"></script>
+<script src="js/auth.js?v=4"></script>
+<script src="js/app.js?v=4"></script>
+<script>
+  // ── Auth Guard ────────────────────────────────────────────
+  (async () => {
+    const { createClient } = supabase;
+    const _sb = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+    const { data: { user } } = await _sb.auth.getUser();
+    if (!user) { window.location.href = 'login.html'; return; }
+
+    // Allow free users to fill the form. The plan check happens when they click Generate.
+    const navName = document.createElement('span');
+    navName.style.cssText = 'font-size:var(--font-size-xs);color:var(--color-text-muted);font-weight:600;';
+    navName.textContent = user.email;
+    document.querySelector('.nav-actions')?.prepend(navName);
+
+    // Pre-fill form email if available
+    const emailInput = document.getElementById('your_email');
+    if (emailInput) emailInput.value = user.email;
+    const nameInput = document.getElementById('your_name');
+    if (nameInput && user.user_metadata?.full_name) nameInput.value = user.user_metadata.full_name;
+  })();
+</script>
+</body>
+</html>

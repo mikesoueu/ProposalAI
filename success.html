@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ProposalAI — Payment Successful! 🎉</title>
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml"/>
+  <link rel="stylesheet" href="css/style.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <style>
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+    .success-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-20) var(--space-6);
+      position: relative;
+    }
+    .success-wrapper::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 50% 40%, rgba(0,217,163,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .success-card {
+      max-width: 520px;
+      width: 100%;
+      background: var(--color-surface);
+      border: 1px solid rgba(0,217,163,0.25);
+      border-radius: var(--radius-xl);
+      padding: var(--space-12) var(--space-10);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      animation: fadeUp 0.6s ease;
+      box-shadow: 0 0 60px rgba(0,217,163,0.12);
+    }
+    .success-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--grad-accent);
+    }
+    .success-icon {
+      font-size: 5rem;
+      margin-bottom: var(--space-6);
+      display: block;
+      animation: bounce 0.6s ease 0.3s both;
+    }
+    @keyframes bounce {
+      0% { transform: scale(0.3); opacity: 0; }
+      60% { transform: scale(1.15); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .success-title {
+      font-size: var(--font-size-2xl);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      margin-bottom: var(--space-3);
+    }
+    .success-sub {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      line-height: 1.7;
+      margin-bottom: var(--space-8);
+    }
+    .plan-activated {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-3);
+      background: rgba(0,217,163,0.12);
+      border: 1.5px solid rgba(0,217,163,0.3);
+      border-radius: var(--radius-full);
+      padding: var(--space-3) var(--space-6);
+      font-weight: 700;
+      color: var(--color-accent);
+      font-size: var(--font-size-sm);
+      margin-bottom: var(--space-8);
+    }
+    .success-actions {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+    .check-status {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-faint);
+      margin-top: var(--space-4);
+    }
+    .confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 100; }
+    .confetti-piece {
+      position: absolute;
+      width: 10px; height: 10px;
+      top: -10px;
+      animation: confettiFall linear forwards;
+      border-radius: 2px;
+    }
+    @keyframes confettiFall {
+      to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Nav ─────────────────────────────────────────────────── -->
+<nav class="nav scrolled">
+  <div class="container nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" width="20" height="20">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+        </svg>
+      </div>
+      <span class="nav-logo-text">ProposalAI</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ── Confetti ─────────────────────────────────────────────── -->
+<div class="confetti" id="confetti"></div>
+
+<!-- ── Success Card ─────────────────────────────────────────── -->
+<div class="success-wrapper">
+  <div class="success-card">
+    <span class="success-icon">🎉</span>
+    <h1 class="success-title">Payment Successful!</h1>
+    <p class="success-sub">
+      Thank you for subscribing to ProposalAI! Your account is being activated.<br>
+      This usually takes just a few seconds.
+    </p>
+
+    <div class="plan-activated" id="plan-badge">
+      <span id="plan-spinner" class="spinner" style="width:16px;height:16px;border-width:2px;border-top-color:var(--color-accent);"></span>
+      <span id="plan-text">Activating your plan...</span>
+    </div>
+
+    <div class="success-actions">
+      <a href="dashboard.html" class="btn btn-accent btn-lg">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        Go to My Dashboard
+      </a>
+      <a href="app.html" class="btn btn-ghost">
+        ✨ Create My First Proposal
+      </a>
+    </div>
+
+    <p class="check-status" id="check-status">
+      Checking subscription status... If access isn't granted within 2 minutes, please <a href="mailto:support@proposalai.app" style="color:var(--color-primary);">contact support</a>.
+    </p>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script>
+  // ── Confetti ──────────────────────────────────────────────
+  const colors = ['#7C6CFF','#00D9A3','#FFB836','#FF5C7A','#A78BFF','#00B8D4'];
+  const container = document.getElementById('confetti');
+  for (let i = 0; i < 80; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.cssText = `
+      left: ${Math.random() * 100}%;
+      background: ${colors[Math.floor(Math.random() * colors.length)]};
+      width: ${6 + Math.random() * 10}px;
+      height: ${6 + Math.random() * 10}px;
+      animation-duration: ${2 + Math.random() * 3}s;
+      animation-delay: ${Math.random() * 1.5}s;
+      opacity: ${0.6 + Math.random() * 0.4};
+      border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+    `;
+    container.appendChild(piece);
+  }
+
+  // ── Check Supabase for activated plan (polling) ───────────
+  const { createClient } = supabase;
+  const _supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+
+  async function checkPlan() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (!user) return null;
+
+    const { data } = await _supabase
+      .from('subscriptions')
+      .select('plan, billing, status')
+      .eq('email', user.email)
+      .eq('status', 'active')
+      .maybeSingle();
+
+    return data;
+  }
+
+  async function pollPlan() {
+    const spinner = document.getElementById('plan-spinner');
+    const planText = document.getElementById('plan-text');
+    const checkStatus = document.getElementById('check-status');
+
+    let attempts = 0;
+    const maxAttempts = 20; // 20 × 3s = 60s max
+
+    const interval = setInterval(async () => {
+      attempts++;
+      const sub = await checkPlan();
+
+      if (sub) {
+        clearInterval(interval);
+        const planNames = { starter: 'Starter', pro: 'Pro', agency: 'Agency' };
+        const billing = sub.billing === 'annual' ? 'Annual' : 'Monthly';
+        spinner.style.display = 'none';
+        planText.textContent = `✅ ${planNames[sub.plan] || 'Pro'} Plan Activated (${billing})`;
+        checkStatus.textContent = 'Your subscription is active! You can now create unlimited proposals.';
+        checkStatus.style.color = 'var(--color-accent)';
+      } else if (attempts >= maxAttempts) {
+        clearInterval(interval);
+        spinner.style.display = 'none';
+        planText.textContent = '⚠️ Activation in progress...';
+        checkStatus.innerHTML = 'Taking longer than expected. Please check your <a href="dashboard.html" style="color:var(--color-primary);">dashboard</a> in a few minutes, or <a href="mailto:support@proposalai.app" style="color:var(--color-primary);">contact support</a>.';
+      }
+    }, 3000);
+  }
+
+  // Start polling after 2 seconds (give Stripe time to send webhook)
+  setTimeout(pollPlan, 2000);
+</script>
+</body>
+</html>

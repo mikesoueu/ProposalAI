@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ProposalAI — Your Proposal</title>
+  <meta name="description" content="View, sign, and pay your professional AI-generated proposal from ProposalAI."/>
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml"/>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/proposal.css"/>
+  <!-- html2pdf.js for PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<!-- ── Navigation ──────────────────────────────────────── -->
+<nav class="nav scrolled" role="navigation">
+  <div class="container nav-inner">
+    <a href="dashboard.html" class="nav-logo">
+      <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" width="20" height="20">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+        </svg>
+      </div>
+      <span class="nav-logo-text">ProposalAI</span>
+    </a>
+    <div class="nav-actions">
+      <a href="app.html" class="btn btn-ghost btn-sm">← Builder</a>
+      <div class="lang-switcher">
+        <button id="lang-btn">🇺🇸 English</button>
+        <div id="lang-dropdown" class="lang-dropdown" data-lang-menu></div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Proposal Wrapper ─────────────────────────────────── -->
+<div class="proposal-wrapper">
+
+  <!-- Toolbar -->
+  <div class="proposal-toolbar" role="toolbar" aria-label="Proposal actions">
+    <div class="proposal-toolbar-left">
+      <div class="proposal-status">
+        <div class="proposal-status-dot" id="status-dot"></div>
+        <span id="proposal-status-text" style="color:var(--color-text-muted);font-size:var(--font-size-xs);font-weight:600;">Awaiting Signature</span>
+      </div>
+      <span id="toolbar-proposal-title" style="font-size:var(--font-size-sm);font-weight:700;color:var(--color-text);"></span>
+    </div>
+    <div class="proposal-toolbar-right">
+      <button class="btn btn-ghost btn-sm" id="send-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
+        <span data-i18n="app_send">Send to Client</span>
+      </button>
+      <button class="btn btn-ghost btn-sm" id="pdf-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span data-i18n="app_download">Download PDF</span>
+      </button>
+      <button class="btn btn-ghost btn-sm" id="new-proposal-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        <span data-i18n="app_newprop">New Proposal</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- No proposal placeholder -->
+  <div id="proposal-placeholder" style="display:none;text-align:center;padding:var(--space-20);">
+    <div style="font-size:3rem;margin-bottom:var(--space-4);">📄</div>
+    <h2 style="font-size:var(--font-size-xl);font-weight:700;margin-bottom:var(--space-3);">No proposal found</h2>
+    <p style="color:var(--color-text-muted);margin-bottom:var(--space-6);">Please go back to the builder and generate a proposal first.</p>
+    <a href="app.html" class="btn btn-primary">Go to Builder</a>
+  </div>
+
+  <!-- ── Proposal Document ────────────────────────────── -->
+  <div class="proposal-document-wrapper">
+    <div class="proposal-document" id="proposal-document">
+
+      <!-- Document Header -->
+      <div class="doc-header">
+        <div class="doc-header-content">
+          <div class="doc-logo-area">
+            <img id="doc-logo-img" class="doc-logo-img" src="assets/logo.svg" alt="Company Logo" style="display:block;"/>
+            <div>
+              <div class="doc-company-name" id="doc-company-name">Your Company</div>
+              <div class="doc-company-contact" id="doc-company-contact">contact@yourcompany.com</div>
+            </div>
+          </div>
+          <div class="doc-meta">
+            <div class="doc-meta-label" data-i18n="prop_for">Prepared for</div>
+            <div class="doc-meta-value" id="doc-meta-for">Client Name</div>
+            <div class="doc-meta-label" style="margin-top:var(--space-3);" data-i18n="prop_date">Date</div>
+            <div class="doc-meta-value" id="doc-meta-date">—</div>
+            <div class="doc-valid-badge" data-i18n="prop_valid">Valid for 30 days</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Title Block -->
+      <div class="doc-title-block">
+        <div class="doc-proposal-label">PROPOSAL</div>
+        <div class="doc-proposal-title" id="doc-proposal-title">Project Proposal</div>
+        <div class="doc-proposal-for" data-i18n="prop_for">Prepared for: <span id="doc-proposal-client">Client</span></div>
+      </div>
+
+      <!-- Body -->
+      <div class="doc-body">
+
+        <!-- Executive Summary -->
+        <div class="doc-section">
+          <div class="doc-section-title" data-i18n="prop_executive">Executive Summary</div>
+          <div class="doc-text" id="doc-executive">
+            <p>Loading proposal...</p>
+          </div>
+        </div>
+
+        <!-- Scope -->
+        <div class="doc-section">
+          <div class="doc-section-title" data-i18n="prop_scope">Project Scope</div>
+          <div class="doc-text" id="doc-scope"></div>
+        </div>
+
+        <!-- Deliverables -->
+        <div class="doc-section">
+          <div class="doc-section-title" data-i18n="prop_deliverables">Deliverables</div>
+          <div class="doc-text" id="doc-deliverables"></div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="doc-section">
+          <div class="doc-section-title" data-i18n="prop_timeline">Timeline</div>
+          <table class="doc-timeline">
+            <thead>
+              <tr>
+                <th>Phase</th>
+                <th>Duration</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody id="doc-timeline-body">
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Investment -->
+        <div class="doc-section">
+          <div class="doc-section-title" data-i18n="prop_investment">Investment</div>
+          <div class="doc-pricing" id="doc-pricing"></div>
+        </div>
+
+        <!-- Terms -->
+        <div class="doc-section">
+          <div class="doc-section-title" data-i18n="prop_terms">Terms &amp; Conditions</div>
+          <div class="doc-text" id="doc-terms"></div>
+        </div>
+
+        <!-- Payment CTA -->
+        <div class="doc-payment-cta" id="doc-payment-section">
+          <div class="doc-payment-title">💳 Ready to move forward?</div>
+          <div class="doc-payment-sub">Pay the retainer to secure your spot and kickstart the project.</div>
+          <a href="#" class="doc-payment-btn" id="doc-payment-link" target="_blank" rel="noopener">
+            <span data-i18n="prop_payment_btn">💳 Pay Retainer Now</span>
+          </a>
+        </div>
+
+        <!-- Signature -->
+        <div class="doc-section">
+          <div class="doc-section-title" data-i18n="prop_signature">Digital Signature</div>
+
+          <!-- Input area (visible until signed) -->
+          <div class="doc-signature-area" id="signature-input-area">
+            <p style="font-size:13px;color:#6666AA;margin-bottom:var(--space-3);">By signing below, you agree to the terms and conditions outlined in this proposal.</p>
+
+            <div class="doc-signature-canvas-wrap">
+              <canvas id="signature-canvas"></canvas>
+              <div class="signature-placeholder" data-i18n="prop_sign_here">Sign here...</div>
+            </div>
+
+            <div class="signature-fields">
+              <div class="signature-field">
+                <label for="sign-name" data-i18n="prop_sign_name">Full Name</label>
+                <input type="text" id="sign-name" data-i18n-ph="prop_sign_name" placeholder="Full Name" autocomplete="name"/>
+              </div>
+              <div class="signature-field">
+                <label for="sign-date" data-i18n="prop_sign_date">Date</label>
+                <input type="date" id="sign-date"/>
+              </div>
+            </div>
+
+            <div class="doc-sign-actions">
+              <button class="btn btn-ghost btn-sm" id="clear-signature" data-i18n="prop_clear">Clear</button>
+              <button class="btn btn-primary" id="sign-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="prop_sign_btn">Accept &amp; Sign Proposal</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Signed state (hidden until signed) -->
+          <div id="signed-state" style="display:none;justify-content:center;align-items:center;flex-direction:column;gap:var(--space-4);padding:var(--space-8);">
+            <div class="doc-signed-badge">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span data-i18n="prop_signed_badge">✅ Signed</span>
+            </div>
+            <p style="font-size:13px;color:#6666AA;text-align:center;">This proposal has been digitally signed and accepted.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Document Footer -->
+      <div class="doc-footer">
+        <div class="doc-footer-brand">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Powered by ProposalAI
+        </div>
+        <span id="doc-footer-id">proposalai.app</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" role="alert" aria-live="polite"></div>
+
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/auth.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/proposal.js"></script>
+</body>
+</html>

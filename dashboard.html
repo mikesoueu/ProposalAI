@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ProposalAI — Dashboard</title>
+  <meta name="description" content="Your ProposalAI dashboard. Create proposals, manage your subscription."/>
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml"/>
+  <link rel="stylesheet" href="css/style.css"/>
+  <style>
+    .dashboard-wrapper {
+      min-height: 100vh;
+      padding-top: var(--nav-height);
+      background: var(--color-bg);
+    }
+
+    .dashboard-header {
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-8) 0;
+    }
+
+    .dashboard-header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+    }
+
+    .user-greeting { font-size: var(--font-size-xs); color: var(--color-text-muted); margin-bottom: var(--space-1); }
+    .user-name { font-size: var(--font-size-xl); font-weight: 800; letter-spacing: -0.02em; }
+
+    .plan-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-xs);
+      font-weight: 700;
+      border: 1.5px solid;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* Dashboard grid */
+    .dashboard-content {
+      padding: var(--space-10) 0 var(--space-20);
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: var(--space-8);
+    }
+
+    /* Stats row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-5);
+      margin-bottom: var(--space-8);
+    }
+
+    .stat-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--grad-primary);
+    }
+
+    .stat-icon {
+      font-size: 1.5rem;
+      margin-bottom: var(--space-3);
+    }
+
+    .stat-val {
+      font-size: var(--font-size-2xl);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: var(--grad-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .stat-label {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-faint);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: var(--space-1);
+    }
+
+    /* New proposal CTA */
+    .new-proposal-cta {
+      background: linear-gradient(135deg, rgba(124,108,255,0.12) 0%, rgba(0,217,163,0.06) 100%);
+      border: 1px solid rgba(124,108,255,0.2);
+      border-radius: var(--radius-xl);
+      padding: var(--space-10);
+      text-align: center;
+      margin-bottom: var(--space-8);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .new-proposal-cta::before {
+      content: '✨';
+      position: absolute;
+      font-size: 120px;
+      opacity: 0.04;
+      top: -20px; right: -10px;
+      line-height: 1;
+    }
+
+    .cta-title {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      margin-bottom: var(--space-2);
+    }
+
+    .cta-sub {
+      color: var(--color-text-muted);
+      font-size: var(--font-size-sm);
+      margin-bottom: var(--space-6);
+    }
+
+    /* Proposals list */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-5);
+    }
+
+    .section-label {
+      font-size: var(--font-size-sm);
+      font-weight: 700;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .proposal-item {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5) var(--space-6);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      transition: border-color var(--transition-fast), transform var(--transition-fast);
+      margin-bottom: var(--space-3);
+    }
+
+    .proposal-item:hover {
+      border-color: var(--color-border-2);
+      transform: translateX(3px);
+    }
+
+    .proposal-info { flex: 1; min-width: 0; }
+    .proposal-title { font-size: var(--font-size-sm); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .proposal-meta { font-size: var(--font-size-xs); color: var(--color-text-faint); margin-top: 2px; }
+
+    .proposal-empty {
+      text-align: center;
+      padding: var(--space-12);
+      color: var(--color-text-faint);
+      font-size: var(--font-size-sm);
+    }
+
+    .proposal-empty-icon { font-size: 3rem; margin-bottom: var(--space-3); }
+
+    /* Sidebar */
+    .sidebar-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      margin-bottom: var(--space-5);
+    }
+
+    .sidebar-title {
+      font-size: var(--font-size-xs);
+      font-weight: 700;
+      color: var(--color-text-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--space-4);
+    }
+
+    .plan-detail-name {
+      font-size: var(--font-size-xl);
+      font-weight: 800;
+      margin-bottom: var(--space-2);
+    }
+
+    .plan-feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      margin-bottom: var(--space-5);
+    }
+
+    .plan-feature-list li {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+    }
+
+    .plan-feature-list li::before {
+      content: '✓';
+      color: var(--color-accent);
+      font-weight: 700;
+    }
+
+    .no-plan-card {
+      background: rgba(255,92,122,0.06);
+      border: 1px solid rgba(255,92,122,0.2);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      text-align: center;
+      margin-bottom: var(--space-5);
+    }
+
+    .no-plan-icon { font-size: 2rem; margin-bottom: var(--space-3); }
+    .no-plan-title { font-weight: 700; margin-bottom: var(--space-2); font-size: var(--font-size-sm); }
+    .no-plan-sub { font-size: var(--font-size-xs); color: var(--color-text-muted); margin-bottom: var(--space-4); }
+
+    /* Skeleton loading */
+    .skeleton {
+      background: linear-gradient(90deg, var(--color-surface-2) 25%, var(--color-surface-3) 50%, var(--color-surface-2) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: var(--radius-md);
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Progress Bar */
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: var(--color-surface-2);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: var(--space-3) 0;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--grad-primary);
+      width: 0%;
+      transition: width 0.3s ease, background 0.3s ease;
+    }
+    .progress-fill.overlimit {
+      background: #FF5C7A;
+    }
+
+    @media (max-width: 900px) {
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .stats-row { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .stats-row { grid-template-columns: 1fr; gap: var(--space-4); }
+      .dashboard-header-inner { flex-direction: column; align-items: flex-start; }
+      .proposal-item { flex-direction: column; align-items: flex-start; gap: var(--space-3); }
+      .proposal-item .btn { width: 100%; }
+      /* Move sidebar below main content */
+      .dashboard-grid { display: flex; flex-direction: column; }
+      .dashboard-grid > div:first-child { order: 1; }
+      .dashboard-grid > div:last-child { order: 2; margin-top: var(--space-6); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Navigation ──────────────────────────────────────── -->
+<nav class="nav scrolled">
+  <div class="container nav-inner">
+    <a href="dashboard.html" class="nav-logo">
+      <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" width="20" height="20">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+        </svg>
+      </div>
+      <span class="nav-logo-text">ProposalAI</span>
+    </a>
+    <div class="nav-actions">
+      <div class="lang-switcher">
+        <button id="lang-btn">🇺🇸 English</button>
+        <div id="lang-dropdown" class="lang-dropdown" data-lang-menu></div>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="logout-btn" onclick="handleLogout()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign Out
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="dashboard-wrapper">
+
+  <!-- ── Dashboard Header ──────────────────────────────── -->
+  <div class="dashboard-header">
+    <div class="container dashboard-header-inner">
+      <div>
+        <div class="user-greeting">Welcome back,</div>
+        <div class="user-name" id="user-name">Loading...</div>
+      </div>
+      <div id="plan-badge-wrap"></div>
+    </div>
+  </div>
+
+  <!-- ── Dashboard Content ────────────────────────────── -->
+  <div class="dashboard-content">
+    <div class="container">
+      <div class="dashboard-grid">
+
+        <!-- Main column -->
+        <div>
+          <!-- Stats -->
+          <div class="stats-row">
+            <div class="stat-card">
+              <div class="stat-icon">📄</div>
+              <div class="stat-val" id="stat-total">—</div>
+              <div class="stat-label">Total Proposals</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">📅</div>
+              <div class="stat-val" id="stat-month">—</div>
+              <div class="stat-label">This Month</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">⚡</div>
+              <div class="stat-val" id="stat-remaining">—</div>
+              <div class="stat-label" data-i18n="dash_stat3">Sign Rate</div>
+            </div>
+          </div>
+
+          <!-- New Proposal CTA -->
+          <div class="new-proposal-cta">
+            <div class="cta-title">✨ Create a New Proposal</div>
+            <div class="cta-sub">Fill out a quick form and let AI write your winning proposal in seconds.</div>
+            <a href="app.html" class="btn btn-primary btn-lg" id="new-prop-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              Create Proposal
+            </a>
+          </div>
+
+          <!-- Recent Proposals -->
+          <div class="section-header">
+            <span class="section-label">Recent Proposals</span>
+          </div>
+          <div id="proposals-list">
+            <div class="proposal-empty">
+              <div class="proposal-empty-icon">📭</div>
+              <p>Loading your proposals...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div>
+          <!-- Subscription card -->
+          <div id="subscription-card">
+            <div class="sidebar-card skeleton" style="height:200px;"></div>
+          </div>
+          
+          <div id="usage-card"></div>
+
+          <!-- Quick links -->
+          <div class="sidebar-card">
+            <div class="sidebar-title" data-i18n="dash_quick_links">Quick Links</div>
+            <div style="display:flex;flex-direction:column;gap:var(--space-3);">
+              <a href="app.html" class="btn btn-ghost" style="justify-content:flex-start;gap:var(--space-3);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                <span data-i18n="dash_new_proposal">New Proposal</span>
+              </a>
+              <a href="#" onclick="event.preventDefault(); AUTH.showPricingModal(true);" class="btn btn-ghost" style="justify-content:flex-start;gap:var(--space-3);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                <span data-i18n="dash_upgrade">Upgrade Plan</span>
+              </a>
+              <a href="index.html" class="btn btn-ghost" style="justify-content:flex-start;gap:var(--space-3);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span data-i18n="dash_homepage">Homepage</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Payment Settings -->
+          <div class="sidebar-card" style="margin-top:var(--space-6);">
+            <div class="sidebar-title" data-i18n="dash_payment_settings">Payment Link</div>
+            <p style="font-size:var(--font-size-xs);color:var(--color-text-muted);margin-bottom:var(--space-3);" data-i18n="dash_payment_desc">Add your Stripe or payment link to include it in your proposals.</p>
+            <input type="url" id="payment-link-input" class="input" placeholder="https://buy.stripe.com/..." style="width:100%;margin-bottom:var(--space-3);">
+            <button id="save-payment-btn" class="btn btn-primary btn-sm" style="width:100%;" data-i18n="dash_save">Save Link</button>
+          </div>
+        </div>
+<div class="toast-container"></div>
+
+<script src="config.js?v=3"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/auth.js?v=3"></script>
+<script src="js/i18n.js?v=3"></script>
+<script>
+  // ── Lang switcher ─────────────────────────────────────────
+  document.getElementById('lang-btn').addEventListener('click', e => {
+    e.stopPropagation();
+    document.getElementById('lang-dropdown').classList.toggle('open');
+  });
+  document.addEventListener('click', () => document.getElementById('lang-dropdown').classList.remove('open'));
+  setTimeout(() => { if (typeof I18N !== 'undefined') I18N.buildLangMenu('lang-dropdown'); }, 300);
+
+  // ── Logout ────────────────────────────────────────────────
+  async function handleLogout() {
+    await AUTH.client.auth.signOut();
+    window.location.href = 'index.html';
+  }
+
+  // ── Load dashboard ────────────────────────────────────────
+  async function loadDashboard() {
+    // Check auth
+    const { data: { user } } = await AUTH.client.auth.getUser();
+    if (!user) { window.location.href = 'login.html'; return; }
+
+    // Set user name
+    const name = user.user_metadata?.full_name || user.email.split('@')[0];
+    document.getElementById('user-name').textContent = `${name} 👋`;
+
+    // Set payment link if exists
+    const paymentLink = user.user_metadata?.payment_link || '';
+    document.getElementById('payment-link-input').value = paymentLink;
+
+    // Load subscription (with Admin Bypass)
+    let sub = null;
+    if (user.email === 'mikemovell2.0@gmail.com' || user.email === 'mikemovel2.0@gmail.com') {
+      sub = { plan: 'agency', status: 'active', billing: 'monthly', expires_at: '2030-01-01T00:00:00Z' };
+    } else {
+      const { data } = await AUTH.client
+        .from('subscriptions')
+        .select('*')
+        .eq('email', user.email)
+        .eq('status', 'active')
+        .maybeSingle();
+      sub = data;
+    }
+
+    renderSubscriptionCard(sub);
+
+    // Load all proposals to compute correct stats
+    const { data: proposals } = await AUTH.client
+      .from('proposals')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+
+    renderProposals(proposals || [], sub);
+  }
+
+  function renderSubscriptionCard(sub) {
+    const container = document.getElementById('subscription-card');
+    const badgeWrap = document.getElementById('plan-badge-wrap');
+    const planColors = { starter: '#8888AA', pro: '#7C6CFF', agency: '#00D9A3' };
+
+    if (!sub) {
+      // No active plan
+      badgeWrap.innerHTML = `<span class="plan-badge" style="border-color:rgba(255,92,122,0.4);color:var(--color-danger);">No Active Plan</span>`;
+      container.innerHTML = `
+        <div class="no-plan-card">
+          <div class="no-plan-icon">🔒</div>
+          <div class="no-plan-title">No Active Plan</div>
+          <div class="no-plan-sub">Choose a plan to unlock unlimited proposal generation.</div>
+          <button onclick="AUTH.showPricingModal(true)" class="btn btn-primary" style="width:100%;">View Plans</button>
+        </div>`;
+
+      // Disable create button for free users (allow 1 for testing)
+      document.getElementById('stat-remaining').textContent = '0';
+      return;
+    }
+
+    const planName = sub.plan.charAt(0).toUpperCase() + sub.plan.slice(1);
+    const color = planColors[sub.plan] || '#7C6CFF';
+    const expiry = sub.expires_at ? new Date(sub.expires_at).toLocaleDateString() : 'Active';
+
+    badgeWrap.innerHTML = `
+      <span class="plan-badge" style="border-color:${color}40;color:${color};background:${color}15;">
+        ⚡ ${planName} Plan
+      </span>`;
+
+    const features = {
+      starter: ['5 proposals/month', 'AI generation', 'PDF export', 'Digital signature'],
+      pro:     ['Unlimited proposals', 'Custom branding', 'Priority AI', 'Email support'],
+      agency:  ['Everything in Pro', '5 team members', 'White-label', 'API access'],
+    };
+
+    container.innerHTML = `
+      <div class="sidebar-card" style="border-color:${color}30;">
+        <div class="sidebar-title">Your Subscription</div>
+        <div class="plan-detail-name" style="color:${color};">${planName} Plan</div>
+        <div style="font-size:var(--font-size-xs);color:var(--color-text-faint);margin-bottom:var(--space-4);">
+          ${sub.billing === 'annual' ? '📅 Annual' : '📅 Monthly'} · Renews ${expiry}
+        </div>
+        <ul class="plan-feature-list">
+          ${(features[sub.plan] || []).map(f => `<li>${f}</li>`).join('')}
+        </ul>
+        <a href="#" onclick="handleManageSubscription(event)" class="btn btn-ghost" style="width:100%;font-size:var(--font-size-xs);">
+          Manage Subscription →
+        </a>
+      </div>`;
+  }
+
+  async function handleManageSubscription(e) {
+    e.preventDefault();
+    const portal = CONFIG?.STRIPE_LINKS?.portal;
+    if (!portal || portal.includes('test_00000')) {
+      alert("Por favor, configure o link do seu Stripe Customer Portal no arquivo config.js (STRIPE_LINKS.portal) para habilitar o gerenciamento de assinaturas.");
+    } else {
+      // Get user email from Supabase session
+      const { data: { user } } = await AUTH.client.auth.getUser();
+      const userEmail = user?.email || '';
+      
+      // Append prefilled_email if it's a Stripe no-code portal link
+      let finalLink = portal;
+      if (userEmail) {
+        finalLink += (portal.includes('?') ? '&' : '?') + 'prefilled_email=' + encodeURIComponent(userEmail);
+      }
+      window.open(finalLink, '_blank');
+    }
+  }
+
+  function renderProposals(proposals, sub) {
+    const container = document.getElementById('proposals-list');
+    const planLimit = { starter: 5, pro: -1, agency: -1 };
+    const limit = sub ? (planLimit[sub.plan] ?? 5) : 0;
+    const thisMonth = proposals.filter(p => {
+      const d = new Date(p.created_at);
+      const now = new Date();
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    }).length;
+
+    // Compute Stats
+    const total = proposals.length;
+    
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-month').textContent = thisMonth;
+    // Hide the third stat card visually in CSS or just don't update it
+    
+    // Usage & Credits Logic
+    const extraCredits = sub?.extra_credits || 0;
+    const usageContainer = document.getElementById('usage-card');
+    
+    if (sub && sub.plan === 'starter') {
+      let percent = Math.round((thisMonth / limit) * 100);
+      let isOverlimit = false;
+      if (percent >= 100) {
+        percent = 100;
+        isOverlimit = true;
+      }
+      
+      usageContainer.innerHTML = `
+        <div class="sidebar-card" style="margin-top:var(--space-5);">
+          <div class="sidebar-title">Usage & Credits</div>
+          
+          <div class="progress-bar-container">
+            <div class="progress-fill ${isOverlimit ? 'overlimit' : ''}" style="width: ${percent}%;"></div>
+          </div>
+          
+          <div style="font-size:var(--font-size-xs); color:var(--color-text-muted); margin-bottom:var(--space-1);">
+            ${thisMonth} of ${limit} plan proposals used
+          </div>
+          <div style="font-size:var(--font-size-sm); color:var(--color-accent); font-weight:700; margin-bottom:var(--space-4);">
+            🎁 ${extraCredits} Extra Credits available
+          </div>
+          
+          <a href="${CONFIG?.STRIPE_LINKS?.credits_5 || '#'}" target="_blank" class="btn btn-ghost" style="width:100%; border:1px solid var(--color-border); font-size:var(--font-size-xs);">
+            ⚡ Buy 10 Extra Proposals - $5
+          </a>
+        </div>
+      `;
+    } else if (sub) {
+       // Pro or Agency (Unlimited)
+       usageContainer.innerHTML = `
+        <div class="sidebar-card" style="margin-top:var(--space-5);">
+          <div class="sidebar-title">Usage & Credits</div>
+          <div style="font-size:var(--font-size-sm); color:var(--color-primary); font-weight:700;">
+            Unlimited Proposals 🚀
+          </div>
+        </div>
+      `;
+    } else {
+       usageContainer.innerHTML = '';
+    }
+
+    if (proposals.length === 0) {
+      container.innerHTML = `
+        <div class="proposal-empty">
+          <div class="proposal-empty-icon">📄</div>
+          <p>No proposals yet. Create your first one!</p>
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = proposals.slice(0, 10).map(p => `
+      <div class="proposal-item">
+        <div class="proposal-info">
+          <div class="proposal-title">${p.title || 'Untitled Proposal'}</div>
+          <div class="proposal-meta">
+            ${p.client_name ? `For ${p.client_name} · ` : ''}
+            ${new Date(p.created_at).toLocaleDateString()}
+          </div>
+        </div>
+        <div style="display:flex;gap:var(--space-2);flex-shrink:0;">
+          <button class="btn btn-ghost btn-sm" onclick="loadProposal('${p.id}')">View</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function loadProposal(id) {
+    const { data } = await AUTH.client
+      .from('proposals')
+      .select('data')
+      .eq('id', id)
+      .single();
+
+    if (data?.data) {
+      localStorage.setItem('proposalai_proposal', JSON.stringify(data.data));
+      window.location.href = 'proposal.html';
+    }
+  }
+
+  // ── Save Payment Link ─────────────────────────────────────
+  document.getElementById('save-payment-btn').addEventListener('click', async () => {
+    const btn = document.getElementById('save-payment-btn');
+    const input = document.getElementById('payment-link-input');
+    btn.textContent = 'Saving...';
+    btn.disabled = true;
+
+    const { error } = await AUTH.client.auth.updateUser({
+      data: { payment_link: input.value.trim() }
+    });
+
+    if (error) {
+      alert('Error saving payment link: ' + error.message);
+    } else {
+      btn.textContent = 'Saved!';
+      setTimeout(() => {
+        btn.textContent = 'Save Link';
+        if(typeof I18N !== 'undefined') I18N.translatePage();
+      }, 2000);
+    }
+    btn.disabled = false;
+  });
+
+  // ── Boot ──────────────────────────────────────────────────
+  loadDashboard();
+</script>
+</body>
+</html>
