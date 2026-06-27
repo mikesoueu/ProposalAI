@@ -92,7 +92,7 @@ serve(async (req) => {
         const user = usersData?.users?.find((u) => u.email === email);
 
         if (session.mode === "payment") {
-          // PAGAMENTO AVULSO (Ex: Compra de Créditos)
+          // PAGAMENTO AVULSO (Ex: Compra de Créditos Dinâmica)
           // Buscar a assinatura atual para somar os créditos
           const { data: currentSub } = await supabase
             .from("subscriptions")
@@ -101,7 +101,7 @@ serve(async (req) => {
             .single();
             
           const currentCredits = currentSub?.extra_credits || 0;
-          const creditsToAdd = 10; // Supondo pacote padrão de 10 créditos
+          const creditsToAdd = parseInt(session.metadata?.extra_credits || "0", 10) || 10;
           
           const { error } = await supabase.from("subscriptions").upsert(
             {

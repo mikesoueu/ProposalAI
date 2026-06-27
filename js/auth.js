@@ -122,9 +122,15 @@ function showPricingModal(isClosable = false) {
         <p style="color: var(--color-text-muted); font-size: 15px; margin-bottom: 24px;">Unlock premium features and win more clients.</p>
         
         <div style="background: rgba(124,108,255,0.1); border: 1px solid rgba(124,108,255,0.3); border-radius: 12px; padding: 16px; margin-bottom: 24px; display: flex; flex-direction: column; align-items: center; gap: 8px;">
-          <div style="font-weight: 600; color: var(--color-text);">Run out of proposals?</div>
-          <div style="font-size: 14px; color: var(--color-text-muted);">Buy 10 credits for $5, OR upgrade to Pro for Custom Branding, No Watermarks, and Unlimited Generations.</div>
-          <a href="${CONFIG?.STRIPE_LINKS?.credits_5 || '#'}" target="_blank" class="btn btn-ghost btn-sm" style="background: var(--color-surface); border: 1px solid var(--color-border); margin-top: 8px;">⚡ Buy 10 Extra Proposals - $5</a>
+          <div style="font-weight: 600; color: var(--color-text);">Run out of proposals? Buy Extra Credits</div>
+          <div style="font-size: 14px; color: var(--color-text-muted);">Choose the amount of credits (Min. 10). Each credit costs $0.50.</div>
+          
+          <div style="display: flex; align-items: center; gap: 12px; margin-top: 8px;">
+            <input type="number" id="extra-credits-input" min="10" value="10" style="width: 80px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-surface); color: #fff; text-align: center; font-weight: bold;" oninput="document.getElementById('extra-credits-price').innerText = '$' + (Math.max(10, this.value) * 0.5).toFixed(2)">
+            <span style="font-weight: 600; color: var(--color-primary); font-size: 18px;" id="extra-credits-price">$5.00</span>
+          </div>
+
+          <button onclick="window.AUTH.buyExtraCredits()" id="buy-credits-btn" class="btn btn-primary btn-sm" style="margin-top: 8px;">⚡ Buy Credits</button>
         </div>
 
         <div style="display:inline-flex; background: var(--color-surface-2); border-radius: 30px; padding: 4px;">
@@ -295,6 +301,49 @@ function openStripeCheckout(plan, billing = 'monthly') {
   });
 }
 
+// ── Stripe: Comprar Créditos Extras Dinamicamente ─────────────
+async function buyExtraCredits() {
+  const input = document.getElementById('extra-credits-input');
+  const btn = document.getElementById('buy-credits-btn');
+  let credits = parseInt(input.value);
+  if (isNaN(credits) || credits < 10) credits = 10;
+  
+  const user = await getCurrentUser();
+  if (!user) {
+    alert('You must be logged in to buy credits.');
+    return;
+  }
+
+  btn.innerText = 'Loading...';
+  btn.disabled = true;
+
+  try {
+    const session = await getSession();
+    const token = session?.access_token;
+    
+    const response = await fetch(`${CONFIG.SUPABASE_URL}/functions/v1/create-checkout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ credits })
+    });
+
+    const data = await response.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      throw new Error(data.error || 'Failed to create checkout session');
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Error connecting to billing system. Try again later.');
+    btn.innerText = '⚡ Buy Credits';
+    btn.disabled = false;
+  }
+}
+
 // ── Observar mudanças de autenticação ───────────────────────
 _supabase.auth.onAuthStateChange((event, session) => {
   if (event === 'SIGNED_OUT') {
@@ -319,6 +368,7 @@ window.AUTH = {
   saveProposal,
   getUserProposals,
   openStripeCheckout,
+  buyExtraCredits,
   showPricingModal,
   client: _supabase,
 };
