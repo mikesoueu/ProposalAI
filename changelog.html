@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Changelog — ProposalAI</title>
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml"/>
+  <link rel="stylesheet" href="css/style.css"/>
+  <style>
+    .inner-hero {
+      padding: calc(var(--nav-height) + var(--space-12)) var(--space-6) var(--space-12);
+      text-align: center;
+      background: var(--grad-hero);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .inner-hero h1 { font-size: var(--font-size-4xl); font-weight: 900; margin-bottom: var(--space-4); letter-spacing: -0.03em; }
+    .inner-hero p { font-size: var(--font-size-lg); color: var(--color-text-muted); max-width: 600px; margin: 0 auto; }
+    .page-content {
+      padding: var(--space-16) var(--space-6);
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.8;
+      color: var(--color-text-muted);
+    }
+    .page-content h2 { color: var(--color-text); margin: var(--space-10) 0 var(--space-4); font-size: var(--font-size-2xl); letter-spacing: -0.02em; }
+    .page-content p { margin-bottom: var(--space-4); }
+    .page-content ul { margin-bottom: var(--space-6); padding-left: var(--space-6); }
+    .page-content li { margin-bottom: var(--space-2); }
+    
+    /* Blog/Changelog Specifics */
+    .changelog-item { border-left: 2px solid var(--color-primary); padding-left: var(--space-6); margin-bottom: var(--space-10); position: relative; }
+    .changelog-item::before { content: ''; position: absolute; left: -9px; top: 0; width: 16px; height: 16px; border-radius: 50%; background: var(--color-bg); border: 2px solid var(--color-primary); }
+    .changelog-date { font-size: var(--font-size-sm); color: var(--color-primary); font-weight: 700; margin-bottom: var(--space-2); }
+    .changelog-title { font-size: var(--font-size-xl); color: var(--color-text); font-weight: 800; margin-bottom: var(--space-3); }
+    
+    .blog-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-6); }
+    .blog-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-6); transition: transform var(--transition-fast); }
+    .blog-card:hover { transform: translateY(-4px); border-color: var(--color-primary); }
+    .blog-tag { font-size: 11px; font-weight: 700; color: var(--color-accent); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: var(--space-3); display: block; }
+    .blog-title { font-size: var(--font-size-lg); color: var(--color-text); font-weight: 700; margin-bottom: var(--space-3); line-height: 1.4; }
+    
+    .job-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-6); margin-bottom: var(--space-4); display: flex; justify-content: space-between; align-items: center; }
+    .job-title { font-size: var(--font-size-lg); color: var(--color-text); font-weight: 700; margin-bottom: var(--space-1); }
+    .job-meta { font-size: var(--font-size-sm); color: var(--color-text-faint); }
+  </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav" style="background: rgba(8, 8, 15, 0.85); backdrop-filter: blur(20px); border-bottom-color: var(--color-border);">
+  <div class="container nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/><polyline points="9 9 10 9"/></svg>
+      </div>
+      <span class="nav-logo-text">ProposalAI</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html#features">Features</a></li>
+      <li><a href="index.html#how">How It Works</a></li>
+      <li><a href="index.html#pricing">Pricing</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="login.html" class="btn btn-ghost btn-sm">Login</a>
+      <a href="login.html" class="btn btn-primary btn-sm">Get Started</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<header class="inner-hero">
+  <h1>Changelog</h1>
+  <p>Keep up with the latest updates and improvements to ProposalAI.</p>
+</header>
+
+<!-- Content -->
+<main class="page-content">
+  
+          <div class="changelog-item">
+            <div class="changelog-date">June 2026</div>
+            <div class="changelog-title">Dynamic Extra Credits & Enhanced Security</div>
+            <p>Users can now buy extra proposal credits dynamically directly from the dashboard. We've also hardened our edge functions and removed static API keys for better security.</p>
+          </div>
+          <div class="changelog-item">
+            <div class="changelog-date">May 2026</div>
+            <div class="changelog-title">Stripe Payment Links Integration</div>
+            <p>You can now connect your Stripe account and automatically embed payment links inside your AI generated proposals, allowing clients to pay the deposit instantly.</p>
+          </div>
+          <div class="changelog-item">
+            <div class="changelog-date">April 2026</div>
+            <div class="changelog-title">ProposalAI v1.0 Launch</div>
+            <p>The official launch of ProposalAI! Generate stunning, professional sales proposals and contracts in under 60 seconds using our advanced AI.</p>
+          </div>
+        
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="nav-logo" style="display:inline-flex;margin-bottom:var(--space-4);">
+          <div class="nav-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" width="20" height="20"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+          <span class="nav-logo-text">ProposalAI</span>
+        </a>
+        <p>Win More Deals. Close Faster.</p>
+      </div>
+      <div>
+        <div class="footer-col-title">Product</div>
+        <ul class="footer-links">
+          <li><a href="index.html#features">Features</a></li>
+          <li><a href="index.html#pricing">Pricing</a></li>
+          <li><a href="changelog.html">Changelog</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Company</div>
+        <ul class="footer-links">
+          <li><a href="about.html">About</a></li>
+          <li><a href="blog.html">Blog</a></li>
+          <li><a href="careers.html">Careers</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Legal</div>
+        <ul class="footer-links">
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="terms.html">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 ProposalAI. All rights reserved.</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
