@@ -310,7 +310,7 @@ async function buyExtraCredits() {
     }
   } catch (err) {
     console.error(err);
-    alert('Error connecting to billing system. Try again later.');
+    alert('Error connecting to billing system: ' + err.message);
     btn.innerText = '⚡ Buy Credits';
     btn.disabled = false;
   }

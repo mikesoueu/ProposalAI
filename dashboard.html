@@ -497,8 +497,8 @@
       return;
     }
 
-    const planName = sub.plan.charAt(0).toUpperCase() + sub.plan.slice(1);
-    const color = planColors[sub.plan] || '#7C6CFF';
+    const planName = sub.plan === 'free' ? 'Free' : 'Premium';
+    const color = sub.plan === 'free' ? '#8888AA' : '#7C6CFF';
     const expiry = sub.expires_at ? new Date(sub.expires_at).toLocaleDateString() : 'Active';
 
     badgeWrap.innerHTML = `
@@ -506,21 +506,22 @@
         ⚡ ${planName} Plan
       </span>`;
 
-    const features = {
-      starter: ['5 proposals/month', 'AI generation', 'PDF export', 'Digital signature'],
-      pro:     ['Unlimited proposals', 'Custom branding', 'Priority AI', 'Email support'],
-      agency:  ['Everything in Pro', '5 team members', 'White-label', 'API access'],
-    };
+    const features = [
+      sub.billing === 'annual' ? '30 proposals / month' : '10 proposals / month',
+      'No Watermarks & Custom Branding',
+      'PDF Export & Stripe Links',
+      'Priority AI Support'
+    ];
 
     container.innerHTML = `
       <div class="sidebar-card" style="border-color:${color}30;">
-        <div class="sidebar-title">Your Subscription</div>
-        <div class="plan-detail-name" style="color:${color};">${planName} Plan</div>
+        <div class="sidebar-title" data-i18n="dash_your_sub">Your Subscription</div>
+        <div class="plan-detail-name" style="color:${color};">${planName} All Access</div>
         <div style="font-size:var(--font-size-xs);color:var(--color-text-faint);margin-bottom:var(--space-4);">
           ${sub.billing === 'annual' ? '📅 Annual' : '📅 Monthly'} · Renews ${expiry}
         </div>
         <ul class="plan-feature-list">
-          ${(features[sub.plan] || []).map(f => `<li>${f}</li>`).join('')}
+          ${features.map(f => `<li>${f}</li>`).join('')}
         </ul>
         <a href="#" onclick="handleManageSubscription(event)" class="btn btn-ghost" style="width:100%;font-size:var(--font-size-xs);">
           Manage Subscription →
@@ -549,8 +550,7 @@
 
   function renderProposals(proposals, sub) {
     const container = document.getElementById('proposals-list');
-    const planLimit = { starter: 5, pro: -1, agency: -1 };
-    const limit = sub ? (planLimit[sub.plan] ?? 5) : 0;
+    const limit = sub ? (sub.billing === 'annual' ? 30 : 10) : 0;
     const thisMonth = proposals.filter(p => {
       const d = new Date(p.created_at);
       const now = new Date();
@@ -562,13 +562,12 @@
     
     document.getElementById('stat-total').textContent = total;
     document.getElementById('stat-month').textContent = thisMonth;
-    // Hide the third stat card visually in CSS or just don't update it
     
     // Usage & Credits Logic
     const extraCredits = sub?.extra_credits || 0;
     const usageContainer = document.getElementById('usage-card');
     
-    if (sub && sub.plan === 'starter') {
+    if (sub && sub.plan !== 'free') {
       let percent = Math.round((thisMonth / limit) * 100);
       let isOverlimit = false;
       if (percent >= 100) {
@@ -578,7 +577,7 @@
       
       usageContainer.innerHTML = `
         <div class="sidebar-card" style="margin-top:var(--space-5);">
-          <div class="sidebar-title">Usage & Credits</div>
+          <div class="sidebar-title" data-i18n="dash_usage">Usage & Credits</div>
           
           <div class="progress-bar-container">
             <div class="progress-fill ${isOverlimit ? 'overlimit' : ''}" style="width: ${percent}%;"></div>
@@ -587,22 +586,19 @@
           <div style="font-size:var(--font-size-xs); color:var(--color-text-muted); margin-bottom:var(--space-1);">
             ${thisMonth} of ${limit} plan proposals used
           </div>
-          <div style="font-size:var(--font-size-sm); color:var(--color-accent); font-weight:700; margin-bottom:var(--space-4);">
-            🎁 ${extraCredits} Extra Credits available
-          </div>
           
-          <a href="${CONFIG?.STRIPE_LINKS?.credits_5 || '#'}" target="_blank" class="btn btn-ghost" style="width:100%; border:1px solid var(--color-border); font-size:var(--font-size-xs);">
-            ⚡ Buy 10 Extra Proposals - $5
-          </a>
-        </div>
-      `;
-    } else if (sub) {
-       // Pro or Agency (Unlimited)
-       usageContainer.innerHTML = `
-        <div class="sidebar-card" style="margin-top:var(--space-5);">
-          <div class="sidebar-title">Usage & Credits</div>
-          <div style="font-size:var(--font-size-sm); color:var(--color-primary); font-weight:700;">
-            Unlimited Proposals 🚀
+          <div style="margin-top: var(--space-6); border-top: 1px solid var(--color-border); padding-top: var(--space-4);">
+            <div style="font-size:var(--font-size-sm); color:var(--color-text); font-weight:700; margin-bottom:var(--space-2);">
+              Extra Credits
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-4);">
+              <span style="font-size:24px; font-weight:800; color:var(--color-accent);">${extraCredits}</span>
+              <span style="font-size:var(--font-size-xs); color:var(--color-text-faint);">Available</span>
+            </div>
+            
+            <a href="#" onclick="if(window.AUTH && window.AUTH.togglePricingModal) window.AUTH.togglePricingModal(true); return false;" class="btn btn-primary" style="width:100%; font-size:var(--font-size-sm);">
+              + Buy More Credits
+            </a>
           </div>
         </div>
       `;
@@ -620,7 +616,7 @@
     }
 
     container.innerHTML = proposals.slice(0, 10).map(p => `
-      <div class="proposal-item">
+      <div class="proposal-item" id="proposal-${p.id}">
         <div class="proposal-info">
           <div class="proposal-title">${p.title || 'Untitled Proposal'}</div>
           <div class="proposal-meta">
@@ -629,7 +625,10 @@
           </div>
         </div>
         <div style="display:flex;gap:var(--space-2);flex-shrink:0;">
-          <button class="btn btn-ghost btn-sm" onclick="loadProposal('${p.id}')">View</button>
+          <button class="btn btn-ghost btn-sm" onclick="loadProposal('${p.id}')">View / Edit</button>
+          <button class="btn btn-ghost btn-sm" style="color:var(--color-danger); border-color:transparent;" onclick="deleteProposal('${p.id}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
         </div>
       </div>
     `).join('');
@@ -643,8 +642,30 @@
       .single();
 
     if (data?.data) {
+      localStorage.setItem('proposalai_proposal_id', id);
       localStorage.setItem('proposalai_proposal', JSON.stringify(data.data));
       window.location.href = 'proposal.html';
+    }
+  }
+
+  async function deleteProposal(id) {
+    if (!confirm('Are you sure you want to delete this proposal? This action cannot be undone.')) return;
+    
+    document.getElementById(`proposal-${id}`).style.opacity = '0.5';
+    
+    const { error } = await AUTH.client
+      .from('proposals')
+      .delete()
+      .eq('id', id);
+      
+    if (error) {
+      alert('Error deleting proposal: ' + error.message);
+      document.getElementById(`proposal-${id}`).style.opacity = '1';
+    } else {
+      document.getElementById(`proposal-${id}`).remove();
+      // Update counters
+      const totalEl = document.getElementById('stat-total');
+      totalEl.textContent = parseInt(totalEl.textContent) - 1;
     }
   }
 

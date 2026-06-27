@@ -20,11 +20,13 @@ serve(async (req) => {
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL') as string;
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') as string;
-    const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY') as string;
-
+    let stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY') as string;
+    
     if (!stripeSecretKey) {
       throw new Error("STRIPE_SECRET_KEY is missing");
     }
+    
+    stripeSecretKey = stripeSecretKey.replace(/["']/g, "").trim();
 
     const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
       global: { headers: { Authorization: authHeader } }

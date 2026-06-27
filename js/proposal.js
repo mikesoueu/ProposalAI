@@ -39,6 +39,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  // ── Setup Edit Mode ──────────────────────────────────────
+  const proposalId = localStorage.getItem('proposalai_proposal_id');
+  if (proposalId) {
+    setupEditMode(proposalId, proposal);
+  }
+
   // ── Render document ─────────────────────────────────────
   renderDocument(proposal);
   setupSignatureCanvas();
@@ -47,6 +53,81 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupSendEmail();
   setupNewProposal();
 });
+
+// ── Setup Edit Mode ─────────────────────────────────────────
+function setupEditMode(id, p) {
+  const saveBtn = document.getElementById('save-edits-btn');
+  if (!saveBtn) return;
+  
+  saveBtn.style.display = 'inline-flex';
+  
+  // Elements that can be edited
+  const editables = ['doc-proposal-title', 'doc-executive', 'doc-scope', 'doc-deliverables', 'doc-timeline-body', 'doc-pricing', 'doc-terms'];
+  
+  // Make them contenteditable after render
+  setTimeout(() => {
+    editables.forEach(eid => {
+      const el = document.getElementById(eid);
+      if (el) {
+        el.setAttribute('contenteditable', 'true');
+        el.style.outline = 'none';
+        el.style.transition = 'background 0.2s';
+        
+        el.addEventListener('focus', () => el.style.background = 'rgba(255,255,255,0.03)');
+        el.addEventListener('blur', () => el.style.background = 'transparent');
+      }
+    });
+  }, 100);
+
+  saveBtn.addEventListener('click', async () => {
+    saveBtn.innerHTML = 'Saving...';
+    saveBtn.disabled = true;
+    
+    // Reverse engineer HTML back to the proposal JSON object where possible, or just store HTML.
+    // For simplicity, since the builder only generates text, and we rendered it to HTML,
+    // storing HTML back into the JSON properties is perfectly fine because renderDocument uses innerHTML.
+    
+    if (el('doc-proposal-title')) p.title = el('doc-proposal-title').innerText;
+    if (el('doc-executive')) p.executive_summary = el('doc-executive').innerHTML;
+    if (el('doc-scope')) p.scope = el('doc-scope').innerHTML;
+    
+    // For deliverables, it was an array or string. Let's just save it as raw HTML string now.
+    if (el('doc-deliverables')) p.deliverables = el('doc-deliverables').innerHTML;
+    if (el('doc-terms')) p.terms = el('doc-terms').innerHTML;
+    
+    // Timeline and Pricing are arrays of objects, but if they edit HTML, we can't easily parse it back to array.
+    // So we add a special property in the JSON to hold the raw overridden HTML.
+    if (el('doc-timeline-body')) p._timeline_html = el('doc-timeline-body').innerHTML;
+    if (el('doc-pricing')) p._pricing_html = el('doc-pricing').innerHTML;
+    
+    // Update local storage
+    localStorage.setItem('proposalai_proposal', JSON.stringify(p));
+    
+    // Update Supabase
+    try {
+      const { error } = await window.AUTH.client
+        .from('proposals')
+        .update({
+          title: p.title,
+          data: p
+        })
+        .eq('id', id);
+        
+      if (error) throw error;
+      
+      saveBtn.innerHTML = 'Saved!';
+      setTimeout(() => {
+        saveBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> <span>Save Edits</span>';
+        saveBtn.disabled = false;
+      }, 2000);
+      
+    } catch (err) {
+      alert('Error saving edits: ' + err.message);
+      saveBtn.innerHTML = 'Save Edits';
+      saveBtn.disabled = false;
+    }
+  });
+}
 
 // ── Render Proposal Document ────────────────────────────────
 function renderDocument(p) {
@@ -85,19 +166,26 @@ function renderDocument(p) {
 
   // Timeline
   const timelineEl = el('doc-timeline-body');
-  if (timelineEl && Array.isArray(p.timeline)) {
-    timelineEl.innerHTML = p.timeline.map(row => `
-      <tr>
-        <td><strong>${row.phase}</strong></td>
-        <td>${row.duration}</td>
-        <td>${row.description}</td>
-      </tr>
-    `).join('');
+  if (timelineEl) {
+    if (p._timeline_html) {
+      timelineEl.innerHTML = p._timeline_html;
+    } else if (Array.isArray(p.timeline)) {
+      timelineEl.innerHTML = p.timeline.map(row => `
+        <tr>
+          <td><strong>${row.phase}</strong></td>
+          <td>${row.duration}</td>
+          <td>${row.description}</td>
+        </tr>
+      `).join('');
+    }
   }
 
   // Pricing
   const pricingEl = el('doc-pricing');
-  if (pricingEl && Array.isArray(p.pricing)) {
+  if (pricingEl) {
+    if (p._pricing_html) {
+      pricingEl.innerHTML = p._pricing_html;
+    } else if (Array.isArray(p.pricing)) {
     pricingEl.innerHTML = p.pricing.map(item => `
       <div class="doc-pricing-item">
         <div>
