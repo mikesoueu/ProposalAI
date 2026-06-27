@@ -54,7 +54,8 @@ serve(async (req) => {
         return new Response(JSON.stringify({ error: 'No active plan. Please upgrade or buy credits.' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       }
 
-      const planType = sub.plan; // 'free', 'starter', 'pro', 'agency'
+      const planType = sub.plan; // 'free', 'starter'
+      const billing = sub.billing || 'monthly';
       const extraCredits = sub.extra_credits || 0;
 
       // Calculate proposals generated this month
@@ -71,14 +72,12 @@ serve(async (req) => {
       const proposalsUsedThisMonth = count || 0;
 
       // Define limits
-      const LIMITS: Record<string, number> = {
-        'free': 1,
-        'starter': 5,
-        'pro': -1, // unlimited
-        'agency': -1 // unlimited
-      };
-
-      const limit = LIMITS[planType] !== undefined ? LIMITS[planType] : 0;
+      let limit = 0;
+      if (planType === 'free') {
+        limit = 1;
+      } else if (planType === 'starter') {
+        limit = billing === 'annual' ? 30 : 10;
+      }
 
       if (limit !== -1 && proposalsUsedThisMonth >= limit) {
         // Plan limit reached, try to use extra credit

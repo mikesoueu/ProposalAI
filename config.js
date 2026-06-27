@@ -30,17 +30,12 @@ const CONFIG = {
   //     Monthly plans
   STRIPE_LINKS: {
     starter:        "https://buy.stripe.com/7sYfZg6lP4LU67R9N12kw00", // $29
-    pro:            "https://buy.stripe.com/8x214mh0t6U23ZJaR52kw01", // $79
-    agency:         "https://buy.stripe.com/7sYbJ07pTbai2VF7ET2kw02", // $149
     portal:         "https://billing.stripe.com/p/login/7sYfZg6lP4LU67R9N12kw00",  // Customer Portal
-    credits_5:      "", // $5 for 10 Extra Proposals
   },
 
   //     Annual plans (20% discount)
   STRIPE_LINKS_ANNUAL: {
     starter_annual: "https://buy.stripe.com/28E3cu25z7Y67bVe3h2kw03", // $276
-    pro_annual:     "https://buy.stripe.com/aFa14m8tXdiqdAj6AP2kw04", // $756
-    agency_annual:  "https://buy.stripe.com/7sY4gy25z4LU67RbV92kw05", // $1428
   },
 
   // ─── App Settings ─────────────────────────────────────────────────────────
@@ -50,9 +45,7 @@ const CONFIG = {
 
   // ─── Plans & Pricing ──────────────────────────────────────────────────────
   PLANS: {
-    starter: { name: "Starter", price_monthly: 29,  price_annual: 23,  proposals: 5  },
-    pro:     { name: "Pro",     price_monthly: 79,  price_annual: 63,  proposals: -1 }, // -1 = unlimited
-    agency:  { name: "Agency",  price_monthly: 149, price_annual: 119, proposals: -1 },
+    starter: { name: "Premium", price_monthly: 29,  price_annual: 23,  proposals_monthly: 10, proposals_annual: 30 },
   },
 
   CREDIT_PACK: { price: 5, amount: 10 },

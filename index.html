@@ -456,10 +456,11 @@
       <span class="save-badge" data-i18n="pricing_save">Save 20%</span>
     </div>
 
-    <div class="pricing-grid">
-      <!-- Starter -->
-      <div class="glass-card pricing-card" data-animate>
-        <div class="plan-name" data-i18n="plan_starter">Starter</div>
+    <div class="pricing-grid" style="display: flex; justify-content: center; max-width: 600px; margin: 0 auto;">
+      <!-- Premium -->
+      <div class="glass-card pricing-card popular" style="width: 100%;" data-animate>
+        <div class="popular-badge" data-i18n="plan_popular">All Access</div>
+        <div class="plan-name" data-i18n="plan_starter">Premium</div>
         <div class="plan-price">
           <span class="plan-price-sym">$</span>
           <span class="plan-price-val price-monthly">29</span>
@@ -467,53 +468,14 @@
           <span class="plan-price-per" data-i18n="plan_mo">/mo</span>
         </div>
         <ul class="plan-features" role="list">
-          <li data-i18n="plan_s1">5 proposals per month</li>
+          <li data-i18n="plan_s1">10 proposals per month (30 on annual)</li>
           <li data-i18n="plan_s2">AI proposal generation</li>
-          <li data-i18n="plan_s3">PDF export</li>
-          <li data-i18n="plan_s4">Digital signature</li>
-          <li data-i18n="plan_s5">Stripe payment links</li>
-          <li style="color: var(--color-accent); font-weight: 500; font-size: 13px; margin-top: 8px;">⚡ Run out of proposals? Buy extra credits on-demand ($5 for 10)</li>
+          <li data-i18n="plan_s3">PDF export & Digital signature</li>
+          <li data-i18n="plan_s4">Stripe payment links</li>
+          <li data-i18n="plan_s5">Custom branding & No Watermarks</li>
+          <li style="color: var(--color-accent); font-weight: 500; font-size: 13px; margin-top: 8px;">⚡ Run out of proposals? Buy extra credits dynamically on-demand</li>
         </ul>
-        <button class="btn btn-ghost" style="width:100%;" id="btn-starter" data-i18n="plan_cta_start" onclick="handlePlanClick('starter')">Get Started</button>
-      </div>
-
-      <!-- Pro -->
-      <div class="glass-card pricing-card popular" data-animate>
-        <div class="popular-badge" data-i18n="plan_popular">Most Popular</div>
-        <div class="plan-name" data-i18n="plan_pro">Pro</div>
-        <div class="plan-price">
-          <span class="plan-price-sym">$</span>
-          <span class="plan-price-val price-monthly">79</span>
-          <span class="plan-price-val price-annual" style="display:none">63</span>
-          <span class="plan-price-per" data-i18n="plan_mo">/mo</span>
-        </div>
-        <ul class="plan-features" role="list">
-          <li data-i18n="plan_p1">Unlimited proposals</li>
-          <li data-i18n="plan_p2">Custom branding & logo</li>
-          <li data-i18n="plan_p3">All Starter features</li>
-          <li data-i18n="plan_p4">Priority AI generation</li>
-          <li data-i18n="plan_p5">Email support</li>
-        </ul>
-        <button class="btn btn-primary" style="width:100%;" id="btn-pro" data-i18n="plan_cta_start" onclick="handlePlanClick('pro')">Get Started</button>
-      </div>
-
-      <!-- Agency -->
-      <div class="glass-card pricing-card" data-animate>
-        <div class="plan-name" data-i18n="plan_agency">Agency</div>
-        <div class="plan-price">
-          <span class="plan-price-sym">$</span>
-          <span class="plan-price-val price-monthly">149</span>
-          <span class="plan-price-val price-annual" style="display:none">119</span>
-          <span class="plan-price-per" data-i18n="plan_mo">/mo</span>
-        </div>
-        <ul class="plan-features" role="list">
-          <li data-i18n="plan_a1">Everything in Pro</li>
-          <li data-i18n="plan_a2">5 team members</li>
-          <li data-i18n="plan_a3">White-label (your domain)</li>
-          <li data-i18n="plan_a4">API access</li>
-          <li data-i18n="plan_a5">Dedicated support</li>
-        </ul>
-        <button class="btn btn-ghost" style="width:100%;" id="btn-agency" data-i18n="plan_cta_contact" onclick="handlePlanClick('agency')">Contact Sales</button>
+        <button class="btn btn-primary" style="width:100%;" id="btn-starter" data-i18n="plan_cta_start" onclick="handlePlanClick('starter')">Get Started</button>
       </div>
     </div>
   </div>

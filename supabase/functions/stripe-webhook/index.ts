@@ -27,19 +27,15 @@ const supabase = createClient(
 function getPlanFromPrice(unitAmount: number, interval: string): { plan: string; billing: string } {
   const monthly: Record<number, string> = {
     2900:  "starter",
-    7900:  "pro",
-    14900: "agency",
   };
   const annual: Record<number, string> = {
     2300:  "starter",  // $23/mês × 12
-    6300:  "pro",      // $63/mês × 12
-    11900: "agency",   // $119/mês × 12
   };
 
   if (interval === "year" || annual[unitAmount]) {
-    return { plan: annual[unitAmount] || "pro", billing: "annual" };
+    return { plan: "starter", billing: "annual" };
   }
-  return { plan: monthly[unitAmount] || "pro", billing: "monthly" };
+  return { plan: "starter", billing: "monthly" };
 }
 
 // ── Calcular expiração ────────────────────────────────────────

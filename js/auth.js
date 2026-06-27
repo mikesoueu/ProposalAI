@@ -139,55 +139,23 @@ function showPricingModal(isClosable = false) {
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px;">
+      <div style="display: flex; justify-content: center; max-width: 400px; margin: 0 auto;">
         
-        <!-- Starter -->
-        <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; padding: 24px;">
-          <div style="font-size: 18px; font-weight: 700; color: #8888AA;">Starter</div>
+        <!-- Premium -->
+        <div style="background: rgba(124,108,255,0.05); border: 1.5px solid var(--color-primary); border-radius: 16px; padding: 24px; position: relative; width: 100%;">
+          <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--grad-primary); color: #fff; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 12px; text-transform: uppercase;">All Access</div>
+          <div style="font-size: 18px; font-weight: 700; color: var(--color-primary);">Premium</div>
           <div style="font-size: 32px; font-weight: 800; margin: 16px 0;">
             <span class="modal-price-m">$${CONFIG.PLANS.starter.price_monthly}</span>
             <span class="modal-price-a" style="display:none;">$${CONFIG.PLANS.starter.price_annual}</span>
             <span style="font-size: 14px; color: var(--color-text-muted); font-weight: 500;">/mo</span>
           </div>
           <ul style="list-style:none; padding:0; margin:0 0 24px 0; font-size: 13px; color: var(--color-text-muted); display:flex; flex-direction:column; gap:12px;">
-            <li>✓ ${CONFIG.PLANS.starter.proposals} proposals / month</li>
-            <li>✓ AI generation</li>
-            <li>✓ PDF Export</li>
+            <li>✓ <strong style="color:#fff;"><span class="modal-limits-m">${CONFIG.PLANS.starter.proposals_monthly}</span><span class="modal-limits-a" style="display:none;">${CONFIG.PLANS.starter.proposals_annual}</span> proposals / month</strong></li>
+            <li>✓ No Watermarks & Custom Branding</li>
+            <li>✓ PDF Export & Stripe Links</li>
           </ul>
-          <button onclick="AUTH.openStripeCheckout('starter', window._modalBilling || 'monthly')" class="btn btn-ghost" style="width:100%; border: 1px solid var(--color-border);">Select Starter</button>
-        </div>
-
-        <!-- Pro -->
-        <div style="background: rgba(124,108,255,0.05); border: 1.5px solid var(--color-primary); border-radius: 16px; padding: 24px; position: relative;">
-          <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--grad-primary); color: #fff; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 12px; text-transform: uppercase;">Most Popular</div>
-          <div style="font-size: 18px; font-weight: 700; color: var(--color-primary);">Pro</div>
-          <div style="font-size: 32px; font-weight: 800; margin: 16px 0;">
-            <span class="modal-price-m">$${CONFIG.PLANS.pro.price_monthly}</span>
-            <span class="modal-price-a" style="display:none;">$${CONFIG.PLANS.pro.price_annual}</span>
-            <span style="font-size: 14px; color: var(--color-text-muted); font-weight: 500;">/mo</span>
-          </div>
-          <ul style="list-style:none; padding:0; margin:0 0 24px 0; font-size: 13px; color: var(--color-text-muted); display:flex; flex-direction:column; gap:12px;">
-            <li>✓ <strong style="color:#fff;">No Watermarks</strong></li>
-            <li>✓ Custom Branding</li>
-            <li>✓ Unlimited Proposals</li>
-          </ul>
-          <button onclick="AUTH.openStripeCheckout('pro', window._modalBilling || 'monthly')" class="btn btn-primary" style="width:100%;">Select Pro</button>
-        </div>
-
-        <!-- Agency -->
-        <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; padding: 24px;">
-          <div style="font-size: 18px; font-weight: 700; color: var(--color-accent);">Agency</div>
-          <div style="font-size: 32px; font-weight: 800; margin: 16px 0;">
-            <span class="modal-price-m">$${CONFIG.PLANS.agency.price_monthly}</span>
-            <span class="modal-price-a" style="display:none;">$${CONFIG.PLANS.agency.price_annual}</span>
-            <span style="font-size: 14px; color: var(--color-text-muted); font-weight: 500;">/mo</span>
-          </div>
-          <ul style="list-style:none; padding:0; margin:0 0 24px 0; font-size: 13px; color: var(--color-text-muted); display:flex; flex-direction:column; gap:12px;">
-            <li>✓ Unlimited proposals</li>
-            <li>✓ API Access</li>
-            <li>✓ White-label</li>
-          </ul>
-          <button onclick="AUTH.openStripeCheckout('agency', window._modalBilling || 'monthly')" class="btn btn-ghost" style="width:100%; border: 1px solid var(--color-border);">Select Agency</button>
+          <button onclick="window.AUTH.openStripeCheckout('starter', window._modalBilling || 'monthly')" class="btn btn-primary" style="width:100%;">Select Premium</button>
         </div>
 
       </div>
@@ -202,6 +170,8 @@ function showPricingModal(isClosable = false) {
   const btnA = document.getElementById('modal-toggle-annual');
   const pricesM = document.querySelectorAll('.modal-price-m');
   const pricesA = document.querySelectorAll('.modal-price-a');
+  const limitsM = document.querySelectorAll('.modal-limits-m');
+  const limitsA = document.querySelectorAll('.modal-limits-a');
 
   const setBilling = (type) => {
     window._modalBilling = type;
@@ -215,6 +185,8 @@ function showPricingModal(isClosable = false) {
 
     pricesM.forEach(el => el.style.display = isA ? 'none' : 'inline');
     pricesA.forEach(el => el.style.display = isA ? 'inline' : 'none');
+    limitsM.forEach(el => el.style.display = isA ? 'none' : 'inline');
+    limitsA.forEach(el => el.style.display = isA ? 'inline' : 'none');
   };
 
   btnM.onclick = () => setBilling('monthly');
