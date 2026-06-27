@@ -9,12 +9,13 @@ CREATE TABLE IF NOT EXISTS public.subscriptions (
   id                      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id                 UUID REFERENCES auth.users(id) ON DELETE SET NULL,
   email                   TEXT NOT NULL UNIQUE,
-  plan                    TEXT NOT NULL DEFAULT 'starter',  -- 'starter' | 'pro' | 'agency'
+  plan                    TEXT NOT NULL DEFAULT 'free',  -- 'free' | 'starter' | 'pro' | 'agency'
   billing                 TEXT NOT NULL DEFAULT 'monthly',  -- 'monthly' | 'annual'
   status                  TEXT NOT NULL DEFAULT 'active',   -- 'active' | 'canceled' | 'past_due'
   stripe_customer_id      TEXT,
   stripe_subscription_id  TEXT,
   proposals_used          INTEGER DEFAULT 0,
+  extra_credits           INTEGER DEFAULT 0,
   created_at              TIMESTAMPTZ DEFAULT NOW(),
   expires_at              TIMESTAMPTZ,
   updated_at              TIMESTAMPTZ DEFAULT NOW()
@@ -48,7 +49,7 @@ CREATE POLICY "Users can insert own proposals"
   ON public.proposals FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
--- Permitir que service_role (webhook) escreva em subscriptions
+-- Permitir que service_role (webhook e funções) tenha acesso total
 CREATE POLICY "Service role can manage subscriptions"
   ON public.subscriptions FOR ALL
   USING (auth.role() = 'service_role')
@@ -71,3 +72,18 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER subscriptions_updated_at
   BEFORE UPDATE ON public.subscriptions
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- Trigger para criar assinatura gratuita no cadastro (1 crédito grátis)
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger AS $$
+BEGIN
+  INSERT INTO public.subscriptions (user_id, email, plan, status, extra_credits)
+  VALUES (new.id, new.email, 'free', 'active', 1)
+  ON CONFLICT (email) DO NOTHING;
+  RETURN new;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();

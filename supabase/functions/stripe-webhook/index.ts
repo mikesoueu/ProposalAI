@@ -87,6 +87,37 @@ serve(async (req) => {
           break;
         }
 
+        // Buscar o user_id pelo email no Supabase Auth
+        const { data: usersData } = await supabase.auth.admin.listUsers();
+        const user = usersData?.users?.find((u) => u.email === email);
+
+        if (session.mode === "payment") {
+          // PAGAMENTO AVULSO (Ex: Compra de Créditos)
+          // Buscar a assinatura atual para somar os créditos
+          const { data: currentSub } = await supabase
+            .from("subscriptions")
+            .select("extra_credits")
+            .eq("email", email)
+            .single();
+            
+          const currentCredits = currentSub?.extra_credits || 0;
+          const creditsToAdd = 10; // Supondo pacote padrão de 10 créditos
+          
+          const { error } = await supabase.from("subscriptions").upsert(
+            {
+              email,
+              user_id: user?.id ?? null,
+              extra_credits: currentCredits + creditsToAdd,
+            },
+            { onConflict: "email" }
+          );
+          
+          if (error) console.error("Error adding credits:", error);
+          else console.log(`✅ Added ${creditsToAdd} credits for: ${email}`);
+          break;
+        }
+
+        // ASSINATURA RECORRENTE
         let plan = "pro";
         let billing = "monthly";
 
@@ -103,10 +134,6 @@ serve(async (req) => {
           plan = result.plan;
           billing = result.billing;
         }
-
-        // Buscar o user_id pelo email no Supabase Auth
-        const { data: usersData } = await supabase.auth.admin.listUsers();
-        const user = usersData?.users?.find((u) => u.email === email);
 
         // Salvar / atualizar assinatura
         const { error } = await supabase.from("subscriptions").upsert(

@@ -8,11 +8,10 @@
  */
 
 const CONFIG = {
-  // ─── AI (OpenRouter) ─────────────────────────────────────────────────────
-  // Get your key at: openrouter.ai/keys
-  // OpenRouter is cheaper than OpenAI and supports many models!
-  AI_API_KEY:  "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",
-  AI_BASE_URL: "https://openrouter.ai/api/v1/chat/completions",
+  // ─── AI (Edge Function) ─────────────────────────────────────────────────────
+  // The API key is now securely stored in Supabase Edge Function secrets.
+  AI_API_KEY:  "",
+  AI_BASE_URL: "https://qxnifzehbcyidgvludbl.supabase.co/functions/v1/generate-proposal",
 
   // ── Choose your AI model ────────────────────────────────────────────────
   // Recommended options (from cheapest to best quality):

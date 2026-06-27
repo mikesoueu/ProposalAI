@@ -203,56 +203,7 @@ const APP = (() => {
       return;
     }
 
-    // Limit check for Starter plan
-    let usedExtraCredit = false;
-    let currentExtraCredits = 0;
-    
-    if (plan.plan === 'starter') {
-      const { data: proposals } = await window.AUTH?.getUserProposals(user.id);
-      
-      // We must fetch the sub again to get the freshest extra_credits value
-      const { data: currentSub } = await window.AUTH?.client
-        .from('subscriptions')
-        .select('*')
-        .eq('email', user.email)
-        .eq('status', 'active')
-        .maybeSingle();
-        
-      currentExtraCredits = currentSub?.extra_credits || 0;
-
-      if (proposals) {
-        const thisMonth = new Date().getMonth();
-        const thisYear = new Date().getFullYear();
-        const countThisMonth = proposals.filter(p => {
-          const d = new Date(p.created_at);
-          return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
-        }).length;
-
-        if (countThisMonth >= 5) {
-          if (currentExtraCredits > 0) {
-            // Deduct 1 credit
-            const { error } = await window.AUTH?.client
-              .from('subscriptions')
-              .update({ extra_credits: currentExtraCredits - 1 })
-              .eq('id', currentSub.id);
-              
-            if (!error) {
-              usedExtraCredit = true;
-              currentExtraCredits -= 1;
-            } else {
-              console.error("Failed to deduct credit:", error);
-            }
-          } else {
-            // No credits, block!
-            showToast('Você atingiu o limite de propostas. Compre créditos ou faça o upgrade.', 'error', 6000);
-            if (window.AUTH?.showPricingModal) {
-              window.AUTH.showPricingModal(true); 
-            }
-            return;
-          }
-        }
-      }
-    }
+    // Note: Limit checks and credit deductions are now securely handled by the Edge Function.
     // ───────────────────────────────────────────────────
 
     // Collect all form data
@@ -263,27 +214,25 @@ const APP = (() => {
     document.getElementById('generate-section').style.display = 'none';
     document.getElementById('ai-loading').style.display = 'flex';
     
-    if (usedExtraCredit) {
-       showToast(`⚡ 1 Extra Credit used. (${currentExtraCredits} remaining)`, 'success', 5000);
-    }
+
 
     const proposalLang = d.proposal_language || I18N.getCurrentLang() || 'en';
     const currency = d.proposal_currency || 'USD';
 
     const prompt = buildPrompt(d, proposalLang, currency);
 
+    const session = await window.AUTH?.getSession();
+    const token = session?.access_token;
+
     try {
       const response = await fetch(CONFIG.AI_BASE_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${CONFIG.AI_API_KEY}`,
-          'HTTP-Referer': window.location.origin,  // Required by OpenRouter
-          'X-Title': CONFIG.APP_NAME || 'ProposalAI', // Optional but recommended
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           model: CONFIG.AI_MODEL || 'google/gemini-2.5-flash',
-          temperature: 0.7,
           messages: [
             {
               role: 'system',
@@ -295,18 +244,25 @@ const APP = (() => {
             },
             { role: 'user', content: prompt }
           ],
-          max_tokens: 3000,
           response_format: { type: "json_object" }
         }),
       });
 
+      const responseData = await response.json();
+
       if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.error?.message || 'API error');
+        if (response.status === 403) {
+          showToast(responseData.error || 'Limite atingido. Compre créditos ou faça o upgrade.', 'error', 6000);
+          if (window.AUTH?.showPricingModal) window.AUTH.showPricingModal(true);
+        }
+        throw new Error(responseData.error || 'API error');
       }
 
-      const data = await response.json();
-      const content = data.choices[0].message.content.trim();
+      if (responseData.usedExtraCredit) {
+        showToast('⚡ 1 Extra Credit used.', 'success', 5000);
+      }
+
+      const content = responseData.data.choices[0].message.content.trim();
 
       // Parse JSON from response
       let proposal;
