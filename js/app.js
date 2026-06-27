@@ -441,3 +441,5 @@ function showToast(message, type = 'info', duration = 3500) {
     setTimeout(() => toast.remove(), 300);
   }, duration);
 }
+
+console.log("Netlify Auto-deploy connected!");
